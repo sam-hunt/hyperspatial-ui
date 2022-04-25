@@ -1,4 +1,5 @@
-import { hexToGL } from '../../../App/theme';
+import { hexToGL } from 'App/theme';
+
 import initShaderProgram from './init-shader-program';
 
 const renderWebglRect = (canvasEl: HTMLCanvasElement, bgColor: string) => {

@@ -1,5 +1,6 @@
+import { hexToGL } from 'App/theme';
+
 import initShaderProgram from './init-shader-program';
-import { hexToGL } from '../../../App/theme';
 import drawScene from './draw-scene';
 import initBuffers from './init-buffers';
 
