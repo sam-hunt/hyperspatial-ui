@@ -8,6 +8,8 @@ interface IUseApiWebsocket<T extends AbstractEvent> {
     lastEvent: T | null;
     sendEvent: (jsonMessage: T, keep?: boolean) => void;
     readyState: ReadyState;
+    // TODO: return a function which will hard reboot the websocket connection?
+    // forceRefresh: () => void,
 }
 
 const useApiWebsocket = <T extends AbstractEvent>(eventTypes: T['event'][] = []): IUseApiWebsocket<T> => {
@@ -17,6 +19,7 @@ const useApiWebsocket = <T extends AbstractEvent>(eventTypes: T['event'][] = [])
 
     const wsOptions: WsOptions = {
         share: true,
+        // TODO: try to get this to work across server restarts
         reconnectAttempts: 12,
         reconnectInterval: 5,
         filter: (event: MessageEvent) => eventTypes.includes(JSON.parse(event.data).event),
