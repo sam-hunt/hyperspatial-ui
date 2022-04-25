@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import useWindowSize from '../../../hooks/use-window-size';
-import renderWebglTest from './render-webgl-test';
+import renderWebglRect from './render-webgl-rect';
 
 const SCROLLBAR_WIDTH = 18;
 
@@ -11,7 +11,7 @@ const Canvas = () => {
     const [windowWidth, windowHeight] = useWindowSize();
 
     useEffect(() => {
-        if (canvasEl) renderWebglTest(canvasEl);
+        if (canvasEl) renderWebglRect(canvasEl);
     }, [canvasEl]);
 
     return (

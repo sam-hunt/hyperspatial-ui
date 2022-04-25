@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import Icon from '@mdi/react';
-import { mdiChatOutline, mdiChatProcessingOutline, mdiSend } from '@mdi/js';
+import { mdiChatOutline, mdiChatProcessingOutline } from '@mdi/js';
 import { Badge, Box, IconButton, TextField, useTheme } from '@mui/material';
 import { KeyboardEvent, useState } from 'react';
 import { animated, useSpring } from 'react-spring';
