@@ -2,7 +2,8 @@ import Icon from '@mdi/react';
 import { mdiCheckCircle, mdiCloseCircle, mdiInformation, mdiLoading } from '@mdi/js';
 import { IconButton } from '@mui/material';
 import { ReadyState } from 'react-use-websocket';
-import useApiWebsocket from '../../../../hooks/use-api-websocket';
+
+import useApiWebsocket from 'hooks/use-api-websocket';
 
 const wsStates = {
     [ReadyState.CONNECTING]: {

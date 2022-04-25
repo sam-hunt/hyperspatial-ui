@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import useWindowSize from '../../../hooks/use-window-size';
+import useWindowSize from 'hooks/use-window-size';
 import renderWebglTest from './render-webgl-test';
 
 const SCROLLBAR_WIDTH = 18;

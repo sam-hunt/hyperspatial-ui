@@ -1,5 +1,6 @@
 import { Typography, useTheme } from '@mui/material'
-import useLocalStorage from '../../../../hooks/use-local-storage'
+import useLocalStorage from 'hooks/use-local-storage'
+
 import { ChatEvent } from '../../Events/chat-event'
 
 const ChatLine = ({ chat }: { chat: ChatEvent }) => {

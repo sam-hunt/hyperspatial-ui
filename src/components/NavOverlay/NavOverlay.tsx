@@ -1,8 +1,9 @@
-import { mdiStarFourPoints } from '@mdi/js';
-import Icon from '@mdi/react';
-import { Box, IconButton, Typography, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import Icon from '@mdi/react';
+import { mdiStarFourPoints } from '@mdi/js';
+import { Box, IconButton, Typography, useTheme } from '@mui/material';
+
 import navItems from './nav-items';
 import NavOverlayItem from './NavOverlayItem';
 

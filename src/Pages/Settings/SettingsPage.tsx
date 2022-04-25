@@ -1,9 +1,10 @@
-import { mdiBrightness4, mdiBrightness7 } from '@mdi/js';
-import Icon from '@mdi/react';
-import { Container, IconButton, TextField, Typography } from '@mui/material';
 import { useContext } from 'react';
-import { ThemeContext } from '../../App/App';
-import useLocalStorage from '../../hooks/use-local-storage';
+import Icon from '@mdi/react';
+import { mdiBrightness4, mdiBrightness7 } from '@mdi/js';
+import { Container, IconButton, TextField, Typography } from '@mui/material';
+
+import { ThemeContext } from 'App/App';
+import useLocalStorage from 'hooks/use-local-storage';
 
 const SettingsPage = () => {
     const { currentTheme, toggleTheme } = useContext(ThemeContext);
