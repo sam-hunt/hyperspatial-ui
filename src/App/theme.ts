@@ -36,6 +36,10 @@ export const hexToRgb = (hex: string) => {
         b: parseInt(result[3], 16)
     } : null;
 }
+export const hexToGL = (hex: string): [number, number, number, number] => {
+    const rgb = hexToRgb(hex)!;
+    return [rgb.r/255, rgb.g/255, rgb.b/255, 1.0];
+}
 const componentToHex = (c: number) => { const hex = c.toString(16); return hex.length === 1 ? '0' + hex : hex; }
 export const rgbToHex = (r: number, g: number, b: number) => `#${componentToHex(r)}${componentToHex(g)}${componentToHex(b)}`;
 

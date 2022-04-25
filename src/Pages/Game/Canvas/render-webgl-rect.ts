@@ -1,12 +1,13 @@
+import { hexToGL } from '../../../App/theme';
 import initShaderProgram from './init-shader-program';
 
-const renderWebglRect = (canvasEl: HTMLCanvasElement) => {
+const renderWebglRect = (canvasEl: HTMLCanvasElement, bgColor: string) => {
     const gl = canvasEl?.getContext('webgl');
     if (!gl) return;
 
     // Clear the canvas
-    // gl.clearColor(0, 0, 0, 1);
-    // gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clearColor(...hexToGL(bgColor));
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     const mVertices = [
         -0.15, -0.15, 0.15,
