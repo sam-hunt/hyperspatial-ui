@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-import { ChatEvent } from 'Pages/Game/Events/chat-event';
-import useApiWebsocket from './use-api-websocket';
+import { ChatEvent } from 'pages/game/events/chat-event';
+import { useApiWebSocket } from './use-api-websocket';
 
-const useChat = (bufferSize: number) => {
+export const useChat = (bufferSize: number) => {
     const [chatBuffer, setChatBuffer] = useState<ChatEvent[]>([]);
-    const { lastEvent, sendEvent } = useApiWebsocket(['chat']);
+    const { lastEvent, sendEvent } = useApiWebSocket(['chat']);
 
     if (lastEvent && lastEvent !== chatBuffer[0]) {
         setChatBuffer([lastEvent as ChatEvent, ...chatBuffer.slice(0, bufferSize - 1)])
@@ -15,5 +15,3 @@ const useChat = (bufferSize: number) => {
 
     return { chatBuffer, sendChat };
 };
-
-export default useChat;

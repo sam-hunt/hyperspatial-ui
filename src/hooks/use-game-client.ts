@@ -1,7 +1,9 @@
-import { useMemo, useEffect } from 'react';
+// import { useMemo, useEffect } from 'react';
 // import { GameClient } from '../game/game-client';
 
-const useGameClient = (webSocket: WebSocket, canvasEl: HTMLCanvasElement) => {
+// TODO
+
+export const useGameClient = (webSocket: WebSocket, canvasEl: HTMLCanvasElement) => {
     // let gameClient = useMemo(() => new GameClient(webSocket, canvasEl), [webSocket, canvasEl]);
 
     // useEffect(() => {
@@ -16,5 +18,3 @@ const useGameClient = (webSocket: WebSocket, canvasEl: HTMLCanvasElement) => {
 
     // return gameClient;
 };
-
-export default useGameClient;

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import useWebSocket, { Options as WsOptions, ReadyState } from 'react-use-websocket';
 
-import { apiWsUrl } from 'App/env';
-import { AbstractEvent } from 'Pages/Game/Events/abstract-event';
+import { apiWsUrl } from 'app/env';
+import { AbstractEvent } from 'pages/game/events/abstract-event';
 
-interface IUseApiWebsocket<T extends AbstractEvent> {
+export interface UseApiWebSocket<T extends AbstractEvent> {
     lastEvent: T | null;
     sendEvent: (jsonMessage: T, keep?: boolean) => void;
     readyState: ReadyState;
@@ -12,7 +12,7 @@ interface IUseApiWebsocket<T extends AbstractEvent> {
     // forceRefresh: () => void,
 }
 
-const useApiWebsocket = <T extends AbstractEvent>(eventTypes: T['event'][] = []): IUseApiWebsocket<T> => {
+export const useApiWebSocket = <T extends AbstractEvent>(eventTypes: T['event'][] = []): UseApiWebSocket<T> => {
 
     const [cachedEvent, setCachedEvent] = useState<T | null>(null);
     let eventHasChanged: boolean = false;
@@ -37,5 +37,3 @@ const useApiWebsocket = <T extends AbstractEvent>(eventTypes: T['event'][] = [])
         readyState,
     };
 };
-
-export default useApiWebsocket;

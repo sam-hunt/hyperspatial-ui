@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import useLocalStorage from './use-local-storage';
+import { useLocalStorage } from './use-local-storage';
 
 /**
  * Wrapper for dayjs objects which should be persisted to localstorage
@@ -9,10 +9,8 @@ import useLocalStorage from './use-local-storage';
  * @param initialValue
  * @returns dayjs
  */
-const useLocalStorageDayjs = (key: string, initialValue: dayjs.Dayjs) => {
+export const useLocalStorageDayjs = (key: string, initialValue: dayjs.Dayjs) => {
     const [value, setValue] = useLocalStorage<dayjs.Dayjs>(key, initialValue);
     const storedValue = dayjs(value);
     return [storedValue, setValue] as const;
-}
-
-export default useLocalStorageDayjs;
+};

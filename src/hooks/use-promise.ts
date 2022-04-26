@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 type UsePromiseState<T> = { value: T | null, error: unknown | null, isPending: boolean };
 export type UsePromise<T> = [T | null, Error | unknown | null, boolean];
 
-const usePromise = <T>(promiseOrFunction: Promise<T> | Function, defaultValue: T): UsePromise<T> => {
+export const usePromise = <T>(promiseOrFunction: Promise<T> | Function, defaultValue: T): UsePromise<T> => {
     const [state, setState] = useState<UsePromiseState<T>>({ value: defaultValue, error: null, isPending: true })
 
     useEffect(() => {
@@ -21,6 +21,4 @@ const usePromise = <T>(promiseOrFunction: Promise<T> | Function, defaultValue: T
 
     const { value, error, isPending } = state;
     return [value, error, isPending];
-}
-
-export default usePromise;
+};
