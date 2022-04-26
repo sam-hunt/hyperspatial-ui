@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ChatEvent } from '../Pages/Game/Events/chat-event';
+
+import { ChatEvent } from 'Pages/Game/Events/chat-event';
 import useApiWebsocket from './use-api-websocket';
 
 const useChat = (bufferSize: number) => {

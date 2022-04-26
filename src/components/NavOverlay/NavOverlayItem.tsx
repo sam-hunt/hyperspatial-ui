@@ -2,6 +2,7 @@ import Icon from '@mdi/react';
 import { IconButton, Typography, useTheme } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import { useSpring, animated } from 'react-spring';
+
 import INavItem from './nav-item.interface';
 
 export interface INavOverlayItemProps {

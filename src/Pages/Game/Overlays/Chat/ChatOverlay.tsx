@@ -1,13 +1,15 @@
-import dayjs from 'dayjs';
+import { KeyboardEvent, useState } from 'react';
+import { animated, useSpring } from 'react-spring';
 import Icon from '@mdi/react';
 import { mdiChatOutline, mdiChatProcessingOutline } from '@mdi/js';
 import { Badge, Box, IconButton, TextField, useTheme } from '@mui/material';
-import { KeyboardEvent, useState } from 'react';
-import { animated, useSpring } from 'react-spring';
-import useChat from '../../../../hooks/use-chat';
+import dayjs from 'dayjs';
+
+import { hexToRgb } from 'App/theme';
+import useChat from 'hooks/use-chat';
+import useLocalStorage from 'hooks/use-local-storage';
+
 import ChatLine from './ChatLine';
-import useLocalStorage from '../../../../hooks/use-local-storage';
-import { hexToRgb } from '../../../../App/theme';
 import './ChatOverlay.css';
 
 const ChatOverlay = () => {

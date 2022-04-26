@@ -1,8 +1,7 @@
 import { useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import useWindowSize from '../../../hooks/use-window-size';
-// import renderWebglRect from './render-webgl-rect';
+import useWindowSize from 'hooks/use-window-size';
 import renderWebglSquare from './render-webgl-square';
 
 const SCROLLBAR_WIDTH = 18;

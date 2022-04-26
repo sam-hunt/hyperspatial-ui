@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import useWebSocket, { Options as WsOptions, ReadyState } from 'react-use-websocket';
 
-import { apiWsUrl } from '../App/env';
-import { AbstractEvent } from '../Pages/Game/Events/abstract-event';
+import { apiWsUrl } from 'App/env';
+import { AbstractEvent } from 'Pages/Game/Events/abstract-event';
 
 interface IUseApiWebsocket<T extends AbstractEvent> {
     lastEvent: T | null;

@@ -1,5 +1,6 @@
 import { Container, Typography } from '@mui/material';
-import WIP from '../../components/WIP/WIP';
+
+import WIP from 'components/WIP/WIP';
 
 const StatsPage = () => {
 
