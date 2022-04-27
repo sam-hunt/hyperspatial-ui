@@ -1,13 +1,15 @@
 import { hexToGL } from 'app/theme';
+import { vec4 } from 'gl-matrix';
 
 import { initShaderProgram } from './init-shader-program';
 
-export const renderWebglRect = (canvasEl: HTMLCanvasElement, bgColor: string) => {
+export const renderWebglRect = (canvasEl: HTMLCanvasElement, bgColor: vec4) => {
     const gl = canvasEl?.getContext('webgl');
     if (!gl) return;
 
     // Clear the canvas
-    gl.clearColor(...hexToGL(bgColor));
+    const [r, g, b, a] = Array.from(bgColor);
+    gl.clearColor(r, g, b, a);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     const mVertices = [

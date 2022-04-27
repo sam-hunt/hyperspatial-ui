@@ -20,9 +20,11 @@ export const drawScene = (
     // Clear the canvas
     const [r, g, b, a] = Array.from(bgColor);
     gl.clearColor(r, g, b, a);
+    // gl.clearColor(0, 0, 64, 1);
     gl.clearDepth(1.0);                 // Clear everything
     gl.enable(gl.DEPTH_TEST);           // Enable depth testing
     gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 
     // Create a perspective matrix, a special matrix that is
     // used to simulate the distortion of perspective in a camera.
@@ -31,14 +33,16 @@ export const drawScene = (
     // and we only want to see objects between 0.1 units
     // and 100 units away from the camera.
 
-    const fieldOfView = 45 * Math.PI / 180;   // in radians
+    // const fieldOfView = 120 * Math.PI / 180;   // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
     const zFar = 100.0;
-    const projectionMatrix = mat4.create();
+    const clip = 25.0
 
     // glMatrix always has the first argument as the destination to receive the result.
-    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+    const projectionMatrix = mat4.create();
+    // mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+    mat4.ortho(projectionMatrix, -clip, clip, -clip/aspect, clip/aspect, zNear, zFar);
 
     // Set the drawing position to the "identity" point, which is the center of the scene.
     const modelViewMatrix = mat4.create();

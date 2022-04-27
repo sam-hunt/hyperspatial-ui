@@ -1,5 +1,6 @@
 import { createTheme, PaletteMode } from '@mui/material';
 import { grey } from '@mui/material/colors';
+import { vec4 } from 'gl-matrix';
 
 const lavender = {
     main: '#CB9EFF',
@@ -37,7 +38,7 @@ export const hexToRgb = (hex: string) => {
     } : null;
 }
 
-export const hexToGL = (hex: string): [number, number, number, number] => {
+export const hexToGL = (hex: string): vec4 => {
     const rgb = hexToRgb(hex)!;
     return [rgb.r/255, rgb.g/255, rgb.b/255, 1.0];
 }

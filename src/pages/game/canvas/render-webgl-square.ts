@@ -1,10 +1,9 @@
-import { hexToGL } from 'app/theme';
-
 import { initShaderProgram } from './init-shader-program';
 import { drawScene } from './draw-scene';
 import { initBuffers } from './init-buffers';
+import { vec4 } from 'gl-matrix';
 
-export const renderWebglSquare = (canvasEl: HTMLCanvasElement, bgColor: string) => {
+export const renderWebglSquare = (canvasEl: HTMLCanvasElement, bgColor: vec4) => {
     const gl = canvasEl?.getContext('webgl');
     if (!gl) return;
 
@@ -39,5 +38,5 @@ export const renderWebglSquare = (canvasEl: HTMLCanvasElement, bgColor: string) 
     const buffers = initBuffers(gl);
 
     gl.viewport(0, 0, canvasEl!.width, canvasEl!.height);
-    drawScene(gl,programInfo, buffers, hexToGL(bgColor));
+    drawScene(gl,programInfo, buffers, bgColor);
 };
