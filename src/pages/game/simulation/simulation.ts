@@ -1,5 +1,6 @@
 import { vec4 } from 'gl-matrix';
 import { AbstractEvent } from '../events/abstract-event';
+import { CanvasIO } from './canvas-io';
 import { EcsRegistry } from './ecs/ecs-registry';
 import { SceneRenderer } from './scene-renderer';
 import { AbstractScene } from './scenes/abstract-scene';
@@ -17,13 +18,15 @@ export class SimulationImpl implements Simulation {
     private prevTimestamp = 0;
     private isInit = false;
     public registry = new EcsRegistry();
-    public eventQueue: AbstractEvent[] = [];
-    public sendEvent: (event: AbstractEvent) => void = () => {};
     public sceneRenderer: SceneRenderer | null = null;
     public currentScene: AbstractScene = new TestScene(this);
+    public canvasIo: CanvasIO | null = null;
+    public eventQueue: AbstractEvent[] = [];
+    public sendEvent: (event: AbstractEvent) => void = () => {};
 
     public async run(canvasEl: HTMLCanvasElement, bgColor: vec4) {
         this.sceneRenderer = new SceneRenderer(this.registry, canvasEl, bgColor);
+        this.canvasIo = new CanvasIO(canvasEl);
         
         this.currentScene.init();
         this.isInit = true;
@@ -42,13 +45,8 @@ export class SimulationImpl implements Simulation {
         requestAnimationFrame(frameRequestCallback);
     }
 
-    public queueEvent(event: AbstractEvent) {
-        this.eventQueue.push(event);
-    }
-
-    public set eventCallback(cb: (event: AbstractEvent) => void) {
-        this.sendEvent = cb;
-    }
+    public queueEvent(event: AbstractEvent) { this.eventQueue.push(event); }
+    public set eventCallback(cb: (event: AbstractEvent) => void) { this.sendEvent = cb; }
 
     public release() {
         console.log('release')

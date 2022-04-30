@@ -19,7 +19,8 @@ export const ChatOverlay: FC = () => {
     const [lastSeenAt, setLastSeenAt] = useState<dayjs.Dayjs>(dayjs());
 
     // TODO: Refactor to player context
-    // TODO: Send player id only, server can serve name
+    // TODO: Refactor to ChatSendEvent and ChatReceiveEvent e.g. server can determine user id and serve back names, possibly color
+    // and enforce channel etc
     const [author] = useLocalStorage<string>('playerName', 'Unknown');
 
     const { chatBuffer, sendChat } = useChat(50);
@@ -54,7 +55,7 @@ export const ChatOverlay: FC = () => {
         }
     }
     const backgroundRgb = hexToRgb(theme.palette.background.paper)!;
-    const background = `rgba(${backgroundRgb.r},${backgroundRgb.g},${backgroundRgb.b},0.5)`;
+    const background = `rgba(${backgroundRgb.r},${backgroundRgb.g},${backgroundRgb.b},0.6)`;
 
     return (
         <div style={{ position: 'absolute', left: '10px', bottom: '10px' }} >

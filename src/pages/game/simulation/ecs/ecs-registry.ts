@@ -1,8 +1,8 @@
 // import { ComponentType } from './component-type';
 import { Component } from './component.interface';
 
-interface Entity {
-    // id: string;
+export interface Entity {
+    id: number;
     components: Component[];
 }
 

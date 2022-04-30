@@ -4,7 +4,7 @@ import { initBuffers } from '../canvas/init-buffers';
 import { initShaderProgram } from '../canvas/init-shader-program';
 import { ComponentType } from './ecs/component-type.enum';
 import { EcsRegistry } from './ecs/ecs-registry';
-import { SpriteComponent } from './ecs/sprite.component';
+import { ColorComponent } from './ecs/color.component';
 import { TransformComponent } from './ecs/transform.component';
 import { AbstractScene } from './scenes/abstract-scene';
 
@@ -12,8 +12,9 @@ export class SceneRenderer {
 
     private gl: WebGL2RenderingContext;
 
-    // TODO: Perhaps elsewhere
+    // TODO: Refactor elsewhere (material? mesh?)
     private squareBuffers: { position: WebGLBuffer; }
+    // TODO: Refactor to material/mesh
     private programInfo: ProgramInfo;
 
     public constructor(private registry: EcsRegistry, canvasEl: HTMLCanvasElement, public clearColor: vec4) {
@@ -26,14 +27,21 @@ export class SceneRenderer {
 
             uniform mat4 uModelViewMatrix;
             uniform mat4 uProjectionMatrix;
+            uniform vec4 uColor;
+            varying vec4 fragColor;
 
             void main() {
                 gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+                fragColor = uColor;
             }`;
 
         const fsSource = `
+            precision mediump float;
+            varying vec4 fragColor;
+
             void main(void) {
-                gl_FragColor = vec4(0.43, 0.02, 0.99, 0.1);   
+                // gl_FragColor = vec4(0.43, 0.02, 0.99, 0.1);
+                gl_FragColor = fragColor;
             }`;
 
         const shaderProgram = initShaderProgram(this.gl, vsSource, fsSource);
@@ -46,6 +54,7 @@ export class SceneRenderer {
             uniformLocations: {
                 projectionMatrix: this.gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
                 modelViewMatrix: this.gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+                color: this.gl.getUniformLocation(shaderProgram, 'uColor'),
             },
         };
         this.squareBuffers = initBuffers(this.gl);
@@ -69,9 +78,9 @@ export class SceneRenderer {
         for (const entity of this.registry.entities) {
             
             const transform = entity.components.find(c => c.type === ComponentType.TRANSFORM) as TransformComponent;
-            const sprite = entity.components.find(c => c.type === ComponentType.SPRITE) as SpriteComponent;
+            const color = entity.components.find(c => c.type === ComponentType.COLOR) as ColorComponent;
 
-            if (!transform || !sprite) continue;
+            if (!transform || !color) continue;
 
             // Set the drawing position to the "identity" point, which is the center of the scene.
             const modelViewMatrix = mat4.create();
@@ -117,6 +126,10 @@ export class SceneRenderer {
                 this.programInfo.uniformLocations.modelViewMatrix,
                 false,
                 modelViewMatrix,
+            );
+            this.gl.uniform4fv(
+                this.programInfo.uniformLocations.color!,
+                color.color,
             );
             {
                 const offset = 0;

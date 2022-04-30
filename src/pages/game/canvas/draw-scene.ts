@@ -8,6 +8,7 @@ export interface ProgramInfo {
     uniformLocations: {
         projectionMatrix: ReturnType<WebGLRenderingContextBase['getUniformLocation']>,
         modelViewMatrix: ReturnType<WebGLRenderingContextBase['getUniformLocation']>,
+        color?: ReturnType<WebGLRenderingContextBase['getUniformLocation']>,
     },
 }
 

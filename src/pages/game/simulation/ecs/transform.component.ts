@@ -7,6 +7,9 @@ export class TransformComponent implements Component {
 
     public constructor(
         public position: vec3,
+        // TODO: scale and rot
+        // public scale: vec3,
+        // public rotation: vec3, // TODO: Check type
     ) {}
 
     destroy() {}

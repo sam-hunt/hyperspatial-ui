@@ -2,13 +2,13 @@ import { createTheme, PaletteMode } from '@mui/material';
 import { grey } from '@mui/material/colors';
 import { vec4 } from 'gl-matrix';
 
-const lavender = {
+export const lavender = {
     main: '#CB9EFF',
     light: '#FFCFFF',
     dark: '#996FCB',
     contrastText: '#FFFFFF',
 };
-const royal = {
+export const royal = {
     main: '#7005FC',
     light: '#AB4CFF',
     dark: '#2600C7',
