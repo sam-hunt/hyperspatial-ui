@@ -8,7 +8,7 @@ import { navItems } from './nav-items';
 import { NavOverlayItem } from './NavOverlayItem';
 
 export const NavOverlay: FC = () => {
-    const [isOpen, setIsOpen] = useState<boolean>(true);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const theme = useTheme();
 
     const toggleMenu = () => setIsOpen(!isOpen);
