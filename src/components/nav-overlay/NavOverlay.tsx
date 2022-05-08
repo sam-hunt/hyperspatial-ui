@@ -15,35 +15,40 @@ export const NavOverlay: FC = () => {
 
     return (
         <>
-            <nav style={{ position: 'absolute', top: 0, left: 0, padding: '15px' }}>
-                <Box display='flex' flexDirection='row' alignItems='center'>
+            <nav style={{
+                position: 'absolute', top: 0, left: 0, padding: '15px',
+            }}
+            >
+                <Box display="flex" flexDirection="row" alignItems="center">
                     <IconButton onClick={toggleMenu}>
                         <Icon
                             path={mdiStarFourPoints}
-                            title='Menu'
+                            title="Menu"
                             color={theme.palette.getContrastText(theme.palette.background.default)}
                             size={2}
                         />
                     </IconButton>
                     <Typography
-                        variant='h4'
+                        variant="h4"
                         pl={2}
-                        className='no-select'
+                        className="no-select"
                         style={{ cursor: 'pointer' }}
                         onClick={toggleMenu}
                     >
                         Hyperspatial
                     </Typography>
                 </Box>
-                {isOpen && <Box display='flex' flexDirection='column'>
-                    <ul style={{ listStyle: 'none', paddingLeft: '10px' }}>
-                        {navItems.map((navItem, i) => (
-                            <NavOverlayItem navItem={navItem} delay={i * 50} key={navItem.label} />
-                        ))}
-                    </ul>
-                </Box>}
+                {isOpen && (
+                    <Box display="flex" flexDirection="column">
+                        <ul style={{ listStyle: 'none', paddingLeft: '10px' }}>
+                            {navItems.map((navItem, i) => (
+                                <NavOverlayItem navItem={navItem} delay={i * 50} key={navItem.label} />
+                            ))}
+                        </ul>
+                    </Box>
+                )}
             </nav>
             <Outlet />
         </>
     );
-}
+};

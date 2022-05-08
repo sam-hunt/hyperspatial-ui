@@ -40,12 +40,13 @@ const wsStates = {
 };
 
 export const WebSocketStateOverlay: FC = () => {
-
     const { readyState } = useApiWebSocket();
-    const { title, color, icon, spin } = wsStates[readyState];
+    const {
+        title, color, icon, spin,
+    } = wsStates[readyState];
 
     return (
-        <div style={{ position: 'absolute', top: 0, right: 0 }} >
+        <div style={{ position: 'absolute', top: 0, right: 0 }}>
             <IconButton title={title} color={color as any}>
                 <Icon path={icon} spin={spin} size={1} />
             </IconButton>

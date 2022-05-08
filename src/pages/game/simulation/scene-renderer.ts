@@ -9,17 +9,16 @@ import { TransformComponent } from './ecs/transform.component';
 import { AbstractScene } from './scenes/abstract-scene';
 
 export class SceneRenderer {
-
     private gl: WebGL2RenderingContext;
 
     // TODO: Refactor elsewhere (material? mesh?)
-    private squareBuffers: { position: WebGLBuffer; }
+    private squareBuffers: { position: WebGLBuffer; };
     // TODO: Refactor to material/mesh
     private programInfo: ProgramInfo;
 
     public constructor(private registry: EcsRegistry, canvasEl: HTMLCanvasElement, public clearColor: vec4) {
         const ctx = canvasEl.getContext('webgl2');
-        if (!ctx) { throw new Error(`Failed to initialize webgl2 context`); }
+        if (!ctx) { throw new Error('Failed to initialize webgl2 context'); }
         this.gl = ctx;
 
         const vsSource = `
@@ -70,37 +69,36 @@ export class SceneRenderer {
         // this.gl.clearColor(0, 0, 64, 1);
         this.gl.clearDepth(1.0);
         this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
-        this.gl.depthFunc(this.gl.LEQUAL);  // Near things obscure far things
+        this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT);
 
         // console.log(this.registry.entities.length);
         // TODO: Refactor to materialized view
-        for (const entity of this.registry.entities) {
-            
-            const transform = entity.components.find(c => c.type === ComponentType.TRANSFORM) as TransformComponent;
-            const color = entity.components.find(c => c.type === ComponentType.COLOR) as ColorComponent;
+        this.registry.entities.forEach((entity) => {
+            const transform = entity.components.find((c) => c.type === ComponentType.TRANSFORM) as TransformComponent;
+            const color = entity.components.find((c) => c.type === ComponentType.COLOR) as ColorComponent;
 
-            if (!transform || !color) continue;
+            if (!transform || !color) return;
 
             // Set the drawing position to the "identity" point, which is the center of the scene.
             const modelViewMatrix = mat4.create();
 
             // Now move the drawing position a bit to where we want to start drawing the square.
             mat4.translate(
-                modelViewMatrix,    // destination matrix
-                modelViewMatrix,    // matrix to translate
+                modelViewMatrix, // destination matrix
+                modelViewMatrix, // matrix to translate
                 transform.position,
             );
 
             // Tell WebGL how to pull out the positions from the position
             // buffer into the vertexPosition attribute.
             {
-                const numComponents = 2;  // pull out 2 values per iteration
-                const type = this.gl.FLOAT;    // the data in the buffer is 32bit floats
-                const normalize = false;  // don't normalize
-                const stride = 0;         // how many bytes to get from one set of values to the next
+                const numComponents = 2; // pull out 2 values per iteration
+                const type = this.gl.FLOAT; // the data in the buffer is 32bit floats
+                const normalize = false; // don't normalize
+                const stride = 0; // how many bytes to get from one set of values to the next
                 // 0 = use type and numComponents above
-                const offset = 0;         // how many bytes inside the buffer to start from
+                const offset = 0; // how many bytes inside the buffer to start from
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareBuffers.position);
                 this.gl.vertexAttribPointer(
                     this.programInfo.attribLocations.vertexPosition,
@@ -136,7 +134,7 @@ export class SceneRenderer {
                 const vertexCount = 4;
                 this.gl.drawArrays(this.gl.TRIANGLE_STRIP, offset, vertexCount);
             }
-        }
+        });
     }
 
     public get canvasSize() {
@@ -145,5 +143,4 @@ export class SceneRenderer {
             h: this.gl.canvas.clientHeight,
         };
     }
-
 }

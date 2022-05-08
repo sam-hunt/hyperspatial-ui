@@ -13,7 +13,6 @@ export interface UseApiWebSocket<T extends AbstractEvent> {
 }
 
 export const useApiWebSocket = <T extends AbstractEvent>(eventTypes: T['event'][] = []): UseApiWebSocket<T> => {
-
     const [cachedEvent, setCachedEvent] = useState<T | null>(null);
     let eventHasChanged: boolean = false;
 
@@ -25,7 +24,7 @@ export const useApiWebSocket = <T extends AbstractEvent>(eventTypes: T['event'][
         filter: (event: MessageEvent) => eventTypes.includes(JSON.parse(event.data).event),
     };
     const { lastJsonMessage, sendJsonMessage, readyState } = useWebSocket(apiWsUrl, wsOptions);
-    
+
     if (lastJsonMessage !== cachedEvent) {
         eventHasChanged = true;
         setCachedEvent(lastJsonMessage);

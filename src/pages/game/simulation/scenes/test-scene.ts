@@ -1,21 +1,28 @@
 import dayjs from 'dayjs';
 import { mat4, vec3 } from 'gl-matrix';
-import { SpawnEvent } from 'pages/game/events/spawn-event';
-import { TransformComponent } from '../ecs/transform.component';
-import { AbstractScene } from './abstract-scene';
 import { v4 as uuid } from 'uuid';
+
+import { lavender, royal } from 'app/theme';
+import { SpawnEvent } from 'pages/game/events/spawn-event';
+import { DespawnEvent } from 'pages/game/events/despawn-event';
+import { MoveEvent } from 'pages/game/events/move.event';
+import { hexToGL } from 'utils/hex-to-gl';
+import { AbstractScene } from './abstract-scene';
+import { TransformComponent } from '../ecs/transform.component';
 import { ComponentType } from '../ecs/component-type.enum';
 import { Component } from '../ecs/component.interface';
 import { UuidComponent } from '../ecs/uuid.components';
 import { ColorComponent } from '../ecs/color.component';
 import { NameComponent } from '../ecs/name.component';
-import { DespawnEvent } from 'pages/game/events/despawn-event';
-import { hexToGL, lavender, royal } from 'app/theme';
-import { MoveEvent } from 'pages/game/events/move.event';
+import { SimulationInternals } from '../simulation-internals.interface';
 
 export class TestScene extends AbstractScene {
     private playerId = uuid();
     private lastMovementSent = performance.now();
+
+    public constructor(private simulation: SimulationInternals) {
+        super();
+    }
 
     public init() {
         // TODO: Move camera elsewhere. aspect needs to be recalculated on demand
@@ -65,33 +72,35 @@ export class TestScene extends AbstractScene {
                 return new TransformComponent((c as TransformComponent).position);
             case ComponentType.COLOR:
                 return new ColorComponent((c as ColorComponent).color);
-        };
-    }
+            default:
+                return undefined;
+        }
+    };
 
-    private eid: number = 0
+    private eid: number = 0;
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public update(deltaTime: number): void {
         // Handle events
-        for (const event of this.simulation.eventQueue) {
-
+        this.simulation.eventQueue.forEach((event) => {
             if (event.event === 'spawn') {
                 const se = event as SpawnEvent;
                 this.simulation.registry.entities.push({
                     id: this.eid++,
-                    components: se.components.map(c => this.parseComponent(c)!)
+                    components: se.components.map((c) => this.parseComponent(c)!),
                 });
             }
             if (event.event === 'despawn') {
                 const se = event as DespawnEvent;
                 const i = this.simulation.registry.entities
-                    .findIndex(e => e.components
-                        .find(c => c.type === ComponentType.UUID && (c as UuidComponent).uuid === se.uuid));
+                    .findIndex((e) => e.components
+                        .find((c) => c.type === ComponentType.UUID && (c as UuidComponent).uuid === se.uuid));
                 this.simulation.registry.entities.splice(i, 1);
             }
             if (event.event === 'move') {
                 const me = event as MoveEvent;
-                let entity = this.simulation.registry.entities.find(e => e.components
-                    .find(c => c.type === ComponentType.UUID && (c as UuidComponent).uuid === me.uuid));
+                let entity = this.simulation.registry.entities.find((e) => e.components
+                    .find((c) => c.type === ComponentType.UUID && (c as UuidComponent).uuid === me.uuid));
                 // create if not found // TODO: server spawn only
                 if (!entity) {
                     entity = {
@@ -104,10 +113,10 @@ export class TestScene extends AbstractScene {
                     };
                     this.simulation.registry.entities.push(entity);
                 }
-                const transform = entity.components.find(c => c.type === ComponentType.TRANSFORM) as TransformComponent;
+                const transform = entity.components.find((c) => c.type === ComponentType.TRANSFORM) as TransformComponent;
                 transform.position = me.position;
             }
-        }
+        });
         this.simulation.eventQueue = [];
 
         // Canvas IO
@@ -115,15 +124,16 @@ export class TestScene extends AbstractScene {
         const now = performance.now();
 
         const playerEntity = this.simulation.registry.entities
-            .find(e => e.components.find(c => c.type === ComponentType.UUID && (c as UuidComponent).uuid === this.playerId));
-        const playerTransform = playerEntity?.components.find(c => c.type === ComponentType.TRANSFORM) as TransformComponent;
+            .find((e) => e.components.find((c) => c.type === ComponentType.UUID && (c as UuidComponent).uuid === this.playerId));
+        const playerTransform = playerEntity?.components.find((c) => c.type === ComponentType.TRANSFORM) as TransformComponent;
 
         // TODO: Tie translation deltas to deltatime and eventually a velocity property depending on type of moving object
         const d = 0.25;
         const dx = d * +(io.keysDown.get('d') || 0) - d * +(io.keysDown.get('a') || 0);
         const dy = d * +(io.keysDown.get('w') || 0) - d * +(io.keysDown.get('s') || 0);
 
-        // Send a movement request event, debounced to 20 per second
+        // Send a movement request event, debounced to 60 per second
+        // TODO: Implement velocity support and limit to server tick rate
         if ((dx || dy) && (now - this.lastMovementSent > 16)) {
             this.simulation.sendEvent({
                 event: 'move',
@@ -133,7 +143,6 @@ export class TestScene extends AbstractScene {
             });
             this.lastMovementSent = now;
         }
-
     }
 
     private translateVec3(vec: vec3, x: number, y: number, z: number) {

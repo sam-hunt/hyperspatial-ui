@@ -1,7 +1,7 @@
+import { vec4 } from 'gl-matrix';
 import { initShaderProgram } from './init-shader-program';
 import { drawScene } from './draw-scene';
 import { initBuffers } from './init-buffers';
-import { vec4 } from 'gl-matrix';
 
 export const renderWebglSquare = (canvasEl: HTMLCanvasElement, bgColor: vec4) => {
     const gl = canvasEl?.getContext('webgl');
@@ -38,5 +38,5 @@ export const renderWebglSquare = (canvasEl: HTMLCanvasElement, bgColor: vec4) =>
     const buffers = initBuffers(gl);
 
     gl.viewport(0, 0, canvasEl!.width, canvasEl!.height);
-    drawScene(gl,programInfo, buffers, bgColor);
+    drawScene(gl, programInfo, buffers, bgColor);
 };

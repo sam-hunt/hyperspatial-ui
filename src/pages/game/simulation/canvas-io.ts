@@ -8,15 +8,15 @@ export class CanvasIO {
     public keysDown = new Map<string, boolean>();
 
     public constructor(canvasEl: HTMLCanvasElement) {
-        canvasEl.onmousedown = ev => this.mouseIsDown = true;
-        canvasEl.onmouseup = ev => this.mouseIsDown = false;
-        canvasEl.onmousemove = ev => [this.mouseX, this.mouseY] = [ev.clientX, ev.clientY];
-        canvasEl.onkeydown = ev => this.keysDown.set(ev.key, true);
-        canvasEl.onkeyup = ev => this.keysDown.set(ev.key, false);
-        canvasEl.onblur = ev => {
+        canvasEl.addEventListener('mousedown', () => { this.mouseIsDown = true; });
+        canvasEl.addEventListener('mouseup', () => { this.mouseIsDown = false; });
+        canvasEl.addEventListener('mousemove', (ev) => { this.mouseX = ev.clientX; this.mouseY = ev.clientY; });
+        canvasEl.addEventListener('keydown', (ev) => { this.keysDown.set(ev.key, true); });
+        canvasEl.addEventListener('keyup', (ev) => { this.keysDown.set(ev.key, false); });
+        // TODO: test this more
+        canvasEl.addEventListener('blur', () => {
             this.mouseIsDown = false;
             this.keysDown.forEach((v, k, m) => m.set(k, false));
-        }
+        });
     }
-
 }

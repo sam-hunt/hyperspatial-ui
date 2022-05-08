@@ -5,4 +5,4 @@ export enum ComponentType {
     COLOR,
     SPRITE,
     TILEMAP,
-};
+}

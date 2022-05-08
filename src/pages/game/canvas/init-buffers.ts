@@ -1,5 +1,4 @@
 export const initBuffers = (gl: WebGLRenderingContext) => {
-
     // Create a buffer for the square's positions.
     const positionBuffer = gl.createBuffer()!;
 
@@ -17,9 +16,11 @@ export const initBuffers = (gl: WebGLRenderingContext) => {
     // Now pass the list of positions into WebGL to build the shape. We do this by creating
     // a Float32Array from the JavaScript array, then use it to fill the current buffer.
 
-    gl.bufferData(gl.ARRAY_BUFFER,
+    gl.bufferData(
+        gl.ARRAY_BUFFER,
         new Float32Array(positions),
-        gl.STATIC_DRAW);
+        gl.STATIC_DRAW,
+    );
 
     return {
         position: positionBuffer,

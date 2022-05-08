@@ -4,7 +4,7 @@ import { ComponentType } from './component-type.enum';
 export class ColorComponent {
     public type: ComponentType.COLOR = ComponentType.COLOR;
 
-    public constructor (
+    public constructor(
         public color: vec4,
     ) {}
 }

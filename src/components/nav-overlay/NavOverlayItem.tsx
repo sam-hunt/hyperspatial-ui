@@ -12,7 +12,6 @@ export interface NavOverlayItemProps {
 }
 
 export const NavOverlayItem: FC<NavOverlayItemProps> = ({ navItem, delay }) => {
-
     const theme = useTheme();
 
     const fadeInLeftSpring = useSpring({
@@ -30,18 +29,17 @@ export const NavOverlayItem: FC<NavOverlayItemProps> = ({ navItem, delay }) => {
         '&:hover': {
             color: theme.palette.primary.dark,
         },
-    }
+    };
     const activeNavStyle = {
         ...inactiveNavStyle,
-        // color: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.secondary.main,
         color: theme.palette.primary.main,
-    }
+    };
 
     return (
         <animated.li style={fadeInLeftSpring} key={navItem.label}>
             <NavLink
                 to={navItem.linkTo}
-                style={({ isActive }) => isActive ? activeNavStyle : inactiveNavStyle as any}
+                style={({ isActive }) => (isActive ? activeNavStyle : inactiveNavStyle as any)}
             >
                 <IconButton sx={{ color: 'inherit' }}>
                     <Icon
@@ -49,7 +47,7 @@ export const NavOverlayItem: FC<NavOverlayItemProps> = ({ navItem, delay }) => {
                         size={1.5}
                     />
                 </IconButton>
-                <Typography pl={1.5} className='no-select'>{navItem.label}</Typography>
+                <Typography pl={1.5} className="no-select">{navItem.label}</Typography>
             </NavLink>
         </animated.li>
     );

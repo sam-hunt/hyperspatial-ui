@@ -14,22 +14,21 @@ export const SettingsPage: FC = () => {
 
     return (
         <Container sx={{ pt: 10 }}>
-            <Typography variant='h2'>Settings</Typography>
-            <br/>
-            <IconButton sx={{ ml: 1 }} onClick={toggleTheme} color='inherit'>
+            <Typography variant="h2">Settings</Typography>
+            <br />
+            <IconButton sx={{ ml: 1 }} onClick={toggleTheme} color="inherit">
                 {currentTheme === 'light'
-                    ? <Icon path={mdiBrightness4} title='Menu' size={1} />
-                    : <Icon path={mdiBrightness7} title='Menu' size={1} />
-                }
+                    ? <Icon path={mdiBrightness4} title="Menu" size={1} />
+                    : <Icon path={mdiBrightness7} title="Menu" size={1} />}
             </IconButton>
-            <Typography display='inline' className='no-select' style={{ cursor: 'pointer' }} onClick={toggleTheme}>Toggle theme</Typography>
+            <Typography display="inline" className="no-select" style={{ cursor: 'pointer' }} onClick={toggleTheme}>Toggle theme</Typography>
             <br />
             <br />
             <TextField
-                label='Player name'
-                variant='standard'
+                label="Player name"
+                variant="standard"
                 value={playerName}
-                onChange={event => setPlayerName(event.target.value)}
+                onChange={(event) => setPlayerName(event.target.value)}
             />
         </Container>
     );

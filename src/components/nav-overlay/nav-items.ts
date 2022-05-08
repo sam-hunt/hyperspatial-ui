@@ -21,5 +21,5 @@ export const navItems: NavItem[] = [
         label: 'Settings',
         icon: mdiCog,
         linkTo: '/settings',
-    }
+    },
 ];

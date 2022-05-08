@@ -1,6 +1,6 @@
 /**
  * Creates a shader of the given type, uploads the source and compiles it.
- * 
+ *
  * @param type gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
  * @param source GLSL source code
  */
@@ -8,8 +8,8 @@ const loadShader = (gl: WebGLRenderingContext, type: number, source: string): We
     const shader = gl.createShader(type);
 
     if (!shader) {
-        if (gl.getError() === gl.INVALID_ENUM) throw new Error(`Invalid shader type enum`);
-        else throw new Error(`Failed to create shader`);
+        if (gl.getError() === gl.INVALID_ENUM) throw new Error('Invalid shader type enum');
+        else throw new Error('Failed to create shader');
     }
     // Send the source to the shader object
     gl.shaderSource(shader, source);

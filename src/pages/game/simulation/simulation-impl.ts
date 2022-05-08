@@ -5,16 +5,10 @@ import { EcsRegistry } from './ecs/ecs-registry';
 import { SceneRenderer } from './scene-renderer';
 import { AbstractScene } from './scenes/abstract-scene';
 import { TestScene } from './scenes/test-scene';
+import { Simulation } from './simulation.interface';
+import { SimulationInternals } from './simulation-internals.interface';
 
-export interface Simulation {
-    run(canvasEl: HTMLCanvasElement, bgColor: vec4): Promise<void>;
-    queueEvent(event: AbstractEvent): void;
-    set eventCallback(cb: (event: AbstractEvent) => void);
-    release(): void;
-    isRunning: boolean;
-}
-
-export class SimulationImpl implements Simulation {
+export class SimulationImpl implements Simulation, SimulationInternals {
     private prevTimestamp = 0;
     private isInit = false;
     public registry = new EcsRegistry();
@@ -27,21 +21,20 @@ export class SimulationImpl implements Simulation {
     public async run(canvasEl: HTMLCanvasElement, bgColor: vec4) {
         this.sceneRenderer = new SceneRenderer(this.registry, canvasEl, bgColor);
         this.canvasIo = new CanvasIO(canvasEl);
-        
+
         this.currentScene.init();
         this.isInit = true;
 
-        const frameRequestCallback = (currTimestamp: DOMHighResTimeStamp) => {
-            currTimestamp *= 0.001;
+        const frameRequestCallback = (currTimestampMs: DOMHighResTimeStamp) => {
+            const currTimestamp = currTimestampMs * 0.001;
             const deltaTime = currTimestamp - this.prevTimestamp;
             this.prevTimestamp = currTimestamp;
-    
+
             this.currentScene.update(deltaTime);
             this.sceneRenderer!.drawScene(this.currentScene);
-    
-            requestAnimationFrame(frameRequestCallback);
-        }
 
+            requestAnimationFrame(frameRequestCallback);
+        };
         requestAnimationFrame(frameRequestCallback);
     }
 
@@ -49,7 +42,6 @@ export class SimulationImpl implements Simulation {
     public set eventCallback(cb: (event: AbstractEvent) => void) { this.sendEvent = cb; }
 
     public release() {
-        console.log('release')
         this.currentScene.destroy();
     }
 

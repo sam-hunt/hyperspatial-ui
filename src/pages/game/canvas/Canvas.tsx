@@ -3,14 +3,14 @@ import { FC, useEffect, useMemo, useState } from 'react';
 
 import { useWindowSize } from 'hooks/use-window-size';
 import { useApiWebSocket } from 'hooks/use-api-websocket';
-import { Simulation, SimulationImpl } from '../simulation/simulation';
-import { hexToGL } from 'app/theme';
+import { hexToGL } from 'utils/hex-to-gl';
+import { Simulation } from '../simulation/simulation.interface';
+import { SimulationImpl } from '../simulation/simulation-impl';
 import './Canvas.css';
 
 const SCROLLBAR_WIDTH = 18;
 
 export const Canvas: FC = () => {
-
     const simulation: Simulation = useMemo(() => new SimulationImpl(), []);
     const [canvasEl, setCanvasEl] = useState<HTMLCanvasElement | null>(null);
     const [windowWidth, windowHeight] = useWindowSize();
@@ -35,11 +35,11 @@ export const Canvas: FC = () => {
 
     return (
         <canvas
-            tabIndex={1}
-            ref={el => setCanvasEl(el)}
+            tabIndex={0}
+            ref={(el) => setCanvasEl(el)}
             height={windowHeight - SCROLLBAR_WIDTH}
             width={windowWidth - SCROLLBAR_WIDTH}
             className="no-focus-outline"
-        ></canvas>
+        />
     );
 };
