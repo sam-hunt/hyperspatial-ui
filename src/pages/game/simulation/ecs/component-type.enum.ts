@@ -2,7 +2,6 @@ export enum ComponentType {
     UUID,
     NAME,
     TRANSFORM,
-    COLOR,
-    SPRITE,
+    RENDER2D,
     TILEMAP,
 }

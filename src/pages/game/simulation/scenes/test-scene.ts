@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 import { v4 as uuid } from 'uuid';
 
 import { lavender, royal } from 'app/theme';
@@ -7,25 +7,26 @@ import { SpawnEvent } from 'pages/game/events/spawn-event';
 import { DespawnEvent } from 'pages/game/events/despawn-event';
 import { MoveEvent } from 'pages/game/events/move.event';
 import { hexToGL } from 'utils/hex-to-gl';
-import { AbstractScene } from './abstract-scene';
+import { Scene } from './scene';
 import { TransformComponent } from '../ecs/transform.component';
 import { ComponentType } from '../ecs/component-type.enum';
 import { Component } from '../ecs/component.interface';
 import { UuidComponent } from '../ecs/uuid.components';
-import { ColorComponent } from '../ecs/color.component';
 import { NameComponent } from '../ecs/name.component';
 import { SimulationInternals } from '../simulation-internals.interface';
+import { RendererComponent } from '../ecs/renderer.component';
 
-export class TestScene extends AbstractScene {
+export class TestScene implements Scene {
     private playerId = uuid();
     private lastMovementSent = performance.now();
 
-    public constructor(private simulation: SimulationInternals) {
-        super();
-    }
+    public camera = mat4.create();
+    public clearColor = vec4.create();
+
+    public constructor(private simulation: SimulationInternals) {}
 
     public init() {
-        // TODO: Move camera elsewhere. aspect needs to be recalculated on demand
+        // TODO: Move camera elsewhere. aspect should be recalculated on demand
         const rendererRef = this.simulation.sceneRenderer!;
         const { w, h } = rendererRef.canvasSize;
         const aspect = w / h;
@@ -34,7 +35,10 @@ export class TestScene extends AbstractScene {
         const clip = 25;
         mat4.ortho(this.camera, -clip, clip, -clip / aspect, clip / aspect, zNear, zFar);
 
-        // spawn bg tiles
+        this.simulation.sceneRenderer!.loadMaterial('red');
+
+        // Spawn bg tiles
+        // TODO: Move to server
         for (let x = -16; x <= 16; x += 4) {
             for (let y = -16; y <= 16; y += 4) {
                 this.simulation.registry.entities.push({
@@ -42,13 +46,13 @@ export class TestScene extends AbstractScene {
                     components: [
                         new NameComponent(`${x}-${y}`),
                         new TransformComponent([x, y, -6]),
-                        new ColorComponent(hexToGL(royal.main)),
+                        new RendererComponent('default', [{ name: 'uColor', value: hexToGL(royal.main) }]),
                     ],
                 });
             }
         }
 
-        // spawn player
+        // Request player spawn
         this.simulation.sendEvent({
             event: 'spawn',
             ts: dayjs().toISOString(),
@@ -57,9 +61,17 @@ export class TestScene extends AbstractScene {
                 { type: ComponentType.UUID, uuid: this.playerId } as UuidComponent,
                 { type: ComponentType.NAME, name: window.localStorage.getItem('playerName') } as NameComponent,
                 { type: ComponentType.TRANSFORM, position: [0, 0, -6] } as TransformComponent,
-                { type: ComponentType.COLOR, color: hexToGL(lavender.main) } as ColorComponent,
+                {
+                    type: ComponentType.RENDER2D,
+                    material: 'default',
+                    uniforms: [{ name: 'uColor', value: hexToGL(lavender.main) }],
+                } as RendererComponent,
             ],
         } as SpawnEvent);
+
+        this.simulation.gameEvents.addListener('spawn', this.handleSpawnEvent);
+        this.simulation.gameEvents.addListener('despawn', this.handleDespawnEvent);
+        this.simulation.gameEvents.addListener('move', this.handleMoveEvent);
     }
 
     private parseComponent = (c: Component): Component | undefined => {
@@ -70,8 +82,10 @@ export class TestScene extends AbstractScene {
                 return new NameComponent((c as NameComponent).name);
             case ComponentType.TRANSFORM:
                 return new TransformComponent((c as TransformComponent).position);
-            case ComponentType.COLOR:
-                return new ColorComponent((c as ColorComponent).color);
+            case ComponentType.RENDER2D: {
+                const r = c as RendererComponent;
+                return new RendererComponent(r.material, r.uniforms);
+            }
             default:
                 return undefined;
         }
@@ -81,44 +95,6 @@ export class TestScene extends AbstractScene {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public update(deltaTime: number): void {
-        // Handle events
-        this.simulation.eventQueue.forEach((event) => {
-            if (event.event === 'spawn') {
-                const se = event as SpawnEvent;
-                this.simulation.registry.entities.push({
-                    id: this.eid++,
-                    components: se.components.map((c) => this.parseComponent(c)!),
-                });
-            }
-            if (event.event === 'despawn') {
-                const se = event as DespawnEvent;
-                const i = this.simulation.registry.entities
-                    .findIndex((e) => e.components
-                        .find((c) => c.type === ComponentType.UUID && (c as UuidComponent).uuid === se.uuid));
-                this.simulation.registry.entities.splice(i, 1);
-            }
-            if (event.event === 'move') {
-                const me = event as MoveEvent;
-                let entity = this.simulation.registry.entities.find((e) => e.components
-                    .find((c) => c.type === ComponentType.UUID && (c as UuidComponent).uuid === me.uuid));
-                // create if not found // TODO: server spawn only
-                if (!entity) {
-                    entity = {
-                        id: this.eid++,
-                        components: [
-                            { type: ComponentType.UUID, uuid: me.uuid } as UuidComponent,
-                            { type: ComponentType.TRANSFORM, position: me.position } as TransformComponent,
-                            { type: ComponentType.COLOR, color: hexToGL(lavender.main) } as ColorComponent,
-                        ],
-                    };
-                    this.simulation.registry.entities.push(entity);
-                }
-                const transform = entity.components.find((c) => c.type === ComponentType.TRANSFORM) as TransformComponent;
-                transform.position = me.position;
-            }
-        });
-        this.simulation.eventQueue = [];
-
         // Canvas IO
         const io = this.simulation.canvasIo!;
         const now = performance.now();
@@ -157,6 +133,47 @@ export class TestScene extends AbstractScene {
     }
 
     public destroy(): void {
+        this.simulation.gameEvents.addListener('spawn', this.handleSpawnEvent);
+        this.simulation.gameEvents.addListener('despawn', this.handleDespawnEvent);
+        this.simulation.gameEvents.addListener('move', this.handleMoveEvent);
+        // TODO Refactor to actual ECS
         this.simulation.registry.entities = [];
     }
+
+    private handleSpawnEvent = (spawnEvent: SpawnEvent) => {
+        this.simulation.registry.entities.push({
+            id: this.eid++,
+            components: spawnEvent.components.map((c) => this.parseComponent(c)!),
+        });
+    };
+
+    private handleDespawnEvent = (despawnEvent: DespawnEvent) => {
+        const i = this.simulation.registry.entities
+            .findIndex((e) => e.components
+                .find((c) => c.type === ComponentType.UUID && (c as UuidComponent).uuid === despawnEvent.uuid));
+        this.simulation.registry.entities.splice(i, 1);
+    };
+
+    private handleMoveEvent = (moveEvent: MoveEvent) => {
+        let entity = this.simulation.registry.entities.find((e) => e.components
+            .find((c) => c.type === ComponentType.UUID && (c as UuidComponent).uuid === moveEvent.uuid));
+        // create if not found // TODO: server spawn only
+        if (!entity) {
+            entity = {
+                id: this.eid++,
+                components: [
+                    { type: ComponentType.UUID, uuid: moveEvent.uuid } as UuidComponent,
+                    { type: ComponentType.TRANSFORM, position: moveEvent.position } as TransformComponent,
+                    {
+                        type: ComponentType.RENDER2D,
+                        material: 'default',
+                        uniforms: [{ name: 'uColor', value: hexToGL(lavender.main) }],
+                    } as RendererComponent,
+                ],
+            };
+            this.simulation.registry.entities.push(entity);
+        }
+        const transform = entity.components.find((c) => c.type === ComponentType.TRANSFORM) as TransformComponent;
+        transform.position = moveEvent.position;
+    };
 }

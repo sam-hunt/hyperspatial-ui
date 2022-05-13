@@ -1,9 +1,10 @@
+import EventEmitter from 'events';
 import { vec4 } from 'gl-matrix';
 import { AbstractEvent } from '../events/abstract-event';
 import { CanvasIO } from './canvas-io';
 import { EcsRegistry } from './ecs/ecs-registry';
-import { SceneRenderer } from './scene-renderer';
-import { AbstractScene } from './scenes/abstract-scene';
+import { SceneRenderer } from './renderer/scene-renderer';
+import { Scene } from './scenes/scene';
 import { TestScene } from './scenes/test-scene';
 import { Simulation } from './simulation.interface';
 import { SimulationInternals } from './simulation-internals.interface';
@@ -13,13 +14,14 @@ export class SimulationImpl implements Simulation, SimulationInternals {
     private isInit = false;
     public registry = new EcsRegistry();
     public sceneRenderer: SceneRenderer | null = null;
-    public currentScene: AbstractScene = new TestScene(this);
+    public currentScene: Scene = new TestScene(this);
     public canvasIo: CanvasIO | null = null;
-    public eventQueue: AbstractEvent[] = [];
+    public gameEvents: EventEmitter = new EventEmitter();
     public sendEvent: (event: AbstractEvent) => void = () => {};
 
     public async run(canvasEl: HTMLCanvasElement, bgColor: vec4) {
-        this.sceneRenderer = new SceneRenderer(this.registry, canvasEl, bgColor);
+        this.sceneRenderer = new SceneRenderer(this.registry, canvasEl);
+        this.sceneRenderer.setClearColor(bgColor);
         this.canvasIo = new CanvasIO(canvasEl);
 
         this.currentScene.init();
@@ -38,7 +40,7 @@ export class SimulationImpl implements Simulation, SimulationInternals {
         requestAnimationFrame(frameRequestCallback);
     }
 
-    public queueEvent(event: AbstractEvent) { this.eventQueue.push(event); }
+    public queueEvent(event: AbstractEvent) { this.gameEvents.emit(event.event, event); }
     public set eventCallback(cb: (event: AbstractEvent) => void) { this.sendEvent = cb; }
 
     public release() {
