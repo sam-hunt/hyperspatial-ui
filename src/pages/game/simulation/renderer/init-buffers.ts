@@ -1,4 +1,4 @@
-export const initBuffers = (gl: WebGLRenderingContext) => {
+export const initBuffers = (gl: WebGL2RenderingContext) => {
     // Create a buffer for the square's positions.
     const positionBuffer = gl.createBuffer()!;
 
@@ -7,10 +7,10 @@ export const initBuffers = (gl: WebGLRenderingContext) => {
 
     // Now create an array of positions for the square.
     const positions = [
-        1.0, 1.0,
-        -1.0, 1.0,
-        1.0, -1.0,
-        -1.0, -1.0,
+        1.0, 1.0, -0.0,
+        -1.0, 1.0, -0.0,
+        1.0, -1.0, -0.0,
+        -1.0, -1.0, -0.0,
     ];
 
     // Now pass the list of positions into WebGL to build the shape. We do this by creating

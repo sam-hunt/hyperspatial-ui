@@ -1,5 +1,5 @@
 import { mat4, vec4 } from 'gl-matrix';
-import { initBuffers } from '../../canvas/init-buffers';
+import { initBuffers } from './init-buffers';
 import { ComponentType } from '../ecs/component-type.enum';
 import { EcsRegistry } from '../ecs/ecs-registry';
 import { TransformComponent } from '../ecs/transform.component';
@@ -24,9 +24,9 @@ export class SceneRenderer {
 
         this.defaultMaterial = new Material(
             this.gl,
-            `attribute vec4 aVertexPosition; uniform mat4 uModelViewMatrix; uniform mat4 uProjectionMatrix;
-            void main() { gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition; }`,
-            'precision mediump float; uniform vec4 uColor; void main(void) { gl_FragColor = uColor; }',
+            `attribute vec3 aVertexPosition; uniform mat4 uModelViewMatrix; uniform mat4 uProjectionMatrix;
+            void main() { gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0); }`,
+            'precision highp float; uniform vec4 uColor; void main(void) { gl_FragColor = uColor; }',
         ).init();
         this.squareBuffers = initBuffers(this.gl);
 
@@ -59,7 +59,6 @@ export class SceneRenderer {
         // Clear the screen
         const [r, g, b, a] = Array.from(this.clearColor);
         this.gl.clearColor(r, g, b, a);
-        // this.gl.clearColor(0, 0, 64, 1);
         this.gl.clearDepth(1.0);
         this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
         this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
@@ -78,51 +77,24 @@ export class SceneRenderer {
 
             const material = this.materials.get(renderOptions.material) || this.defaultMaterial!;
 
-            // Set the drawing position to the "identity" point, which is the center of the scene.
             const modelViewMatrix = mat4.create();
-
-            // Now move the drawing position a bit to where we want to start drawing the square.
-            mat4.translate(
-                modelViewMatrix, // destination matrix
-                modelViewMatrix, // matrix to translate
-                transform.position,
-            );
+            mat4.translate(modelViewMatrix, modelViewMatrix, transform.position);
 
             // Tell WebGL how to pull out the positions from the position buffer into the vertexPosition attribute.
-            // TODO: Bind more dynamically based on material attributes
-            {
-                const numComponents = 2; // pull out 2 values per iteration
-                const type = this.gl.FLOAT; // the data in the buffer is 32bit floats
-                const normalize = false; // don't normalize
-                const stride = 0; // how many bytes to get from one set of values to the next
-                // 0 = use type and numComponents above
-                const offset = 0; // how many bytes inside the buffer to start from
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareBuffers.position);
-                this.gl.vertexAttribPointer(
-                    material.attributes[0].location,
-                    numComponents,
-                    type,
-                    normalize,
-                    stride,
-                    offset,
-                );
-                this.gl.enableVertexAttribArray(material.attributes[0].location);
-            }
+            material.attributes.forEach((vertexAttribute) => vertexAttribute.bind(this.gl, this.squareBuffers.position));
 
             // Tell WebGL to use our program when drawing
             this.gl.useProgram(material.shaderProgram);
 
             // Set the shader uniforms
-            // TODO: Bind more dynamically with less branching
-            const uProjectionMatrix = material.uniforms.find((u) => u.name === 'uProjectionMatrix');
-            if (uProjectionMatrix) this.gl.uniformMatrix4fv(uProjectionMatrix.location, false, scene.camera);
+            // TODO: Bind uniforms dynamically without so much checking and branching in the hot loop
+            material.uniforms.find((u) => u.name === 'uProjectionMatrix')?.bindValue(scene.camera);
+            material.uniforms.find((u) => u.name === 'uModelViewMatrix')?.bindValue(modelViewMatrix);
+            const colorValue: vec4 = renderOptions.uniforms.find((u) => u.name === 'uColor')?.value as vec4 || [0.0, 0.0, 0.0, 0.0];
+            material.uniforms.find((u) => u.name === 'uColor')?.bindValue(colorValue);
 
-            const uModelViewMatrix = material.uniforms.find((u) => u.name === 'uModelViewMatrix');
-            if (uModelViewMatrix) this.gl.uniformMatrix4fv(uModelViewMatrix.location, false, modelViewMatrix);
-
-            const uColor = material.uniforms.find((u) => u.name === 'uColor');
-            const color: vec4 = renderOptions.uniforms.find((u) => u.name === 'uColor')?.value as vec4 || [0.0, 0.0, 0.0, 0.0];
-            if (uColor) this.gl.uniform4fv(uColor.location, color);
+            const uTime = material.uniforms.find((u) => u.name === 'uTime');
+            if (uTime) this.gl.uniform1f(uTime.index, window.performance.now());
 
             {
                 const offset = 0;

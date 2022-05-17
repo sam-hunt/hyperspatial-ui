@@ -52,6 +52,15 @@ export class TestScene implements Scene {
             }
         }
 
+        // this.simulation.registry.entities.push({
+        //     id: this.eid++,
+        //     components: [
+        //         new NameComponent('galaxy'),
+        //         new TransformComponent([0, 0, -6]),
+        //         new RendererComponent('default', [{ name: 'uColor', value: hexToGL(royal.main) }]),
+        //     ],
+        // });
+
         // Request player spawn
         this.simulation.sendEvent({
             event: 'spawn',
