@@ -1,52 +1,32 @@
+import { Shader } from './shader';
 import { ShaderUniform } from './shader-uniform';
+import { Texture } from './texture';
 import { VertexAttribute } from './vertex-attribute';
 
 export class Material {
     public shaderProgram: WebGLProgram | null = null;
-    // public textures: Texture[] = [];
-
-    public attributes: VertexAttribute[] = [];
+    public vertexAttributes: VertexAttribute[] = [];
     public uniforms: ShaderUniform[] = [];
+    public textures: Texture[] = [];
 
     public constructor(
         private gl: WebGL2RenderingContext,
         public vertexShaderSrc: string,
         public fragmentShaderSrc: string,
-    ) {}
-
-    private getElCountForGlslType(glslType: string): number {
-        const typeMatch = glslType.match(/(vec|mat|bool|int|float|double)(\d)?(?:x)?(\d)?/);
-        if (!typeMatch) throw new Error(`Unable to parse GLSL type '${glslType}'`);
-        const [subtype, n1, n2] = typeMatch.slice(1, 4);
-        if (subtype === 'vec') return parseInt(n1, 10);
-        if (subtype === 'mat') return parseInt(n1, 10) * (parseInt(n2, 10) || parseInt(n1, 10));
-        return 1;
-    }
-
-    public init() {
-        if (!this.shaderProgram) {
-            this.shaderProgram = this.loadShaderProgram(this.gl, this.vertexShaderSrc, this.fragmentShaderSrc);
-        }
-        return this;
-    }
-
-    public destroy() {
-        if (this.shaderProgram) this.gl.deleteProgram(this.shaderProgram);
-    }
-
-    private loadShaderProgram(gl: WebGL2RenderingContext, vertexShaderSrc: string, fragmentShaderSrc: string): WebGLProgram {
-        let vertexShader: WebGLShader | null = null;
-        let fragmentShader: WebGLShader | null = null;
+        textureUrls: string[] = [],
+    ) {
+        let vertexShader: Shader | null = null;
+        let fragmentShader: Shader | null = null;
         let shaderProgram: WebGLProgram | null = null;
         try {
             // Load the shaders
-            vertexShader = this.loadShader(gl, gl.VERTEX_SHADER, vertexShaderSrc);
-            fragmentShader = this.loadShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSrc);
+            vertexShader = new Shader(gl, gl.VERTEX_SHADER, vertexShaderSrc);
+            fragmentShader = new Shader(gl, gl.FRAGMENT_SHADER, fragmentShaderSrc);
 
             // Create the shader program
             shaderProgram = gl.createProgram()!;
-            gl.attachShader(shaderProgram, vertexShader);
-            gl.attachShader(shaderProgram, fragmentShader);
+            gl.attachShader(shaderProgram, vertexShader.shader!);
+            gl.attachShader(shaderProgram, fragmentShader.shader!);
             gl.linkProgram(shaderProgram);
 
             // Throw on link failure
@@ -56,26 +36,27 @@ export class Material {
 
             // Document the attributes of the program for dynamic binding
             const numAttribs = this.gl.getProgramParameter(shaderProgram, this.gl.ACTIVE_ATTRIBUTES);
+            let offsetAcc = 0;
             for (let i = 0; i < numAttribs; ++i) {
                 const attributeInfo = this.gl.getActiveAttrib(shaderProgram, i);
                 if (!attributeInfo) throw new Error('An error occurred fetching attribute details');
                 const { name } = attributeInfo;
-                // TODO: Test whether 'offset' is correct here, if so move these to VertexAttribute ctor
                 const index = this.gl.getAttribLocation(shaderProgram, attributeInfo.name);
-                // const size = this.gl.getVertexAttrib(index, gl.VERTEX_ATTRIB_ARRAY_SIZE);
                 const type = this.gl.getVertexAttrib(index, gl.VERTEX_ATTRIB_ARRAY_TYPE);
-                const stride = this.gl.getVertexAttrib(index, gl.VERTEX_ATTRIB_ARRAY_STRIDE);
                 const normalized = gl.getVertexAttrib(index, gl.VERTEX_ATTRIB_ARRAY_NORMALIZED);
-                // const offset = gl.getVertexAttribOffset(index, gl.VERTEX_ATTRIB_ARRAY_POINTER);
-                const offset = i;
-                const attrTypeRegex = new RegExp(`(?:attribute\\s+)\\w+(?:\\s+${name}\\s*;)`);
-                const attrTypeMatch = vertexShaderSrc.match(attrTypeRegex);
-                if (!attrTypeMatch) throw new Error('Failed to parse attribute type from shader src');
-                const attrType = attrTypeMatch[0];
-                const size = this.getElCountForGlslType(attrType);
-                const vertexttribute = new VertexAttribute(name, size, type, index, normalized, offset, stride);
-                this.attributes.push(vertexttribute);
+                const glslTypeRegex = new RegExp(`(?:in\\s+)\\w+(?:\\s+${name}\\s*;)`);
+                const glslTypeMatch = vertexShaderSrc.match(glslTypeRegex);
+                if (!glslTypeMatch) throw new Error('Failed to parse attribute type from shader src');
+                const glslType = glslTypeMatch[0];
+                const size = this.getElSizeForGlslType(glslType);
+                const count = this.getElCountForGlslType(glslType);
+                const offset = offsetAcc;
+                offsetAcc += count * size;
+                const vertexAttribute = new VertexAttribute(name, count, type, index, normalized, 0, offset);
+                this.vertexAttributes.push(vertexAttribute);
             }
+            const stride = offsetAcc;
+            this.vertexAttributes.forEach((va) => { const attrib = va; attrib.stride = stride; });
 
             // Document the uniforms of the program for dynamic binding
             const numUniforms = this.gl.getProgramParameter(shaderProgram, this.gl.ACTIVE_UNIFORMS);
@@ -91,35 +72,77 @@ export class Material {
             if (shaderProgram) gl.deleteProgram(shaderProgram);
             throw e;
         } finally {
-            if (vertexShader) gl.deleteShader(vertexShader);
-            if (fragmentShader) gl.deleteShader(fragmentShader);
+            if (vertexShader) gl.deleteShader(vertexShader.shader);
+            if (fragmentShader) gl.deleteShader(fragmentShader.shader);
         }
-        return shaderProgram!;
+        textureUrls.forEach((url) => this.textures.push(new Texture(gl, url)));
+        this.shaderProgram = shaderProgram;
     }
 
-    /**
-     * Creates a shader of the given type, uploads the source and compiles it.
-     *
-     * @param type gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
-     * @param source GLSL source code
-     */
-    private loadShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
-        const shader = gl.createShader(type);
+    private getElCountForGlslType(glslType: string): number {
+        const typeMatch = glslType.match(/(vec|mat|bool|int|float|double)(\d)?(?:x)?(\d)?/);
+        if (!typeMatch) throw new Error(`Unable to parse GLSL type '${glslType}'`);
+        const [subtype, n1, n2] = typeMatch.slice(1, 4);
+        if (subtype === 'vec') return parseInt(n1, 10);
+        if (subtype === 'mat') return parseInt(n1, 10) * (parseInt(n2, 10) || parseInt(n1, 10));
+        return 1;
+    }
 
-        if (!shader) {
-            if (gl.getError() === gl.INVALID_ENUM) throw new Error('Invalid shader type enum');
-            else throw new Error('Failed to create shader');
+    private getElSizeForGlslType(glslType: string): number {
+        if (glslType.match(/(bvec|bool)/)) return 1;
+        if (glslType.match(/(dvec|double)/)) return 8;
+        return 4;
+    }
+
+    public destroy() {
+        if (this.shaderProgram) this.gl.deleteProgram(this.shaderProgram);
+    }
+
+    private static defaultMaterial: Material | null;
+
+    public static default(gl: WebGL2RenderingContext): Material {
+        if (!this.defaultMaterial) {
+            const vertexShaderSrc = `#version 300 es
+                precision highp float;
+                
+                in vec3 aVertexPosition;
+                in vec2 aTextureCoords;
+                
+                uniform mat4 uProjectionMatrix;
+                uniform vec3 uTransformPosition;
+                uniform vec3 uTransformScale;
+                
+                out vec2 vTextureCoords;
+                
+                void main() {
+                    // Translate from origin by world coords
+                    mat4 modelViewMatrix = mat4(
+                        vec4(1.0, 0.0, 0.0, 0.0),
+                        vec4(0.0, 1.0, 0.0, 0.0),
+                        vec4(0.0, 0.0, 1.0, 0.0),
+                        vec4(uTransformPosition, 1.0)
+                    );
+
+                    // Scale the local vertices
+                    vec4 vertexPosition = vec4(aVertexPosition * uTransformScale, 1.0);
+
+                    // Multiple for Model View Projection
+                    gl_Position = uProjectionMatrix * modelViewMatrix * vertexPosition;
+                    vTextureCoords = aTextureCoords;
+                }
+            `;
+            const fragmentShaderSrc = `#version 300 es
+                precision highp float;
+                
+                in vec2 vTextureCoords;
+                out vec4 FragColor;
+
+                void main(void) {
+                    FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+                }
+            `;
+            this.defaultMaterial = new Material(gl, vertexShaderSrc, fragmentShaderSrc);
         }
-        // Send the source to the shader object
-        gl.shaderSource(shader, source);
-
-        // Compile the shader program
-        gl.compileShader(shader);
-
-        // See if it compiled successfully
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            throw new Error(`An error occurred compiling the shaders: ${gl.getShaderInfoLog(shader)}`);
-        }
-        return shader!;
+        return this.defaultMaterial;
     }
 }

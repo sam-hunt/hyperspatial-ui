@@ -1,8 +1,7 @@
 import { ComponentType } from './component-type.enum';
 
-interface UniformOverride {
-    name: string;
-    value: unknown;
+export interface UniformOverrides {
+    [name: string]: unknown;
 }
 
 export class RendererComponent {
@@ -10,6 +9,6 @@ export class RendererComponent {
 
     public constructor(
         public material: string,
-        public uniforms: UniformOverride[],
+        public uniforms: UniformOverrides,
     ) {}
 }

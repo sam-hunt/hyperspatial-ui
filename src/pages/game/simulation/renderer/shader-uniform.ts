@@ -58,6 +58,10 @@ export class ShaderUniform {
     }
 
     public bindValue(value: unknown) {
+        // try {
         this.bindFn.call(this, value);
+        // } catch (e) {
+        //     throw new Error(`failed to bind uniform ${this.name}. Error: ${e}`);
+        // }
     }
 }

@@ -6,4 +6,5 @@ export interface MoveEvent extends AbstractEvent {
     ts: string;
     uuid: string;
     position: vec3;
+    direction: number;
 }

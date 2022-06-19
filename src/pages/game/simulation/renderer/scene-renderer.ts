@@ -1,35 +1,32 @@
-import { mat4, vec4 } from 'gl-matrix';
-import { initBuffers } from './init-buffers';
+import { vec4 } from 'gl-matrix';
 import { ComponentType } from '../ecs/component-type.enum';
 import { EcsRegistry } from '../ecs/ecs-registry';
 import { TransformComponent } from '../ecs/transform.component';
 import { Scene } from '../scenes/scene';
 import { Material } from './material';
-import { RendererComponent } from '../ecs/renderer.component';
+import { RendererComponent, UniformOverrides } from '../ecs/renderer.component';
+import { VertexBuffer } from './vertex-buffer';
 
 export class SceneRenderer {
     private gl: WebGL2RenderingContext;
     private clearColor: vec4 = [0.0, 0.0, 0.0, 0.0];
-    private squareBuffers: { position: WebGLBuffer; };
-    private defaultMaterial: Material | null = null;
+    private planeBuffer: VertexBuffer;
     private materials: Map<string, Material> = new Map();
+    private background: Material;
 
     public constructor(
         private registry: EcsRegistry,
         private canvasEl: HTMLCanvasElement,
     ) {
-        const ctx = this.canvasEl.getContext('webgl2');
+        const ctx = this.canvasEl.getContext('webgl2', { alpha: false, premultipliedAlpha: false });
         if (!ctx) { throw new Error('Failed to initialize webgl2 context'); }
         this.gl = ctx;
 
-        this.defaultMaterial = new Material(
-            this.gl,
-            `attribute vec3 aVertexPosition; uniform mat4 uModelViewMatrix; uniform mat4 uProjectionMatrix;
-            void main() { gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0); }`,
-            'precision highp float; uniform vec4 uColor; void main(void) { gl_FragColor = uColor; }',
-        ).init();
-        this.squareBuffers = initBuffers(this.gl);
+        this.planeBuffer = VertexBuffer.plane(this.gl);
+        this.background = Material.default(this.gl);
 
+        this.gl.enable(this.gl.BLEND);
+        this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
         this.gl.viewport(0, 0, this.gl.canvas.clientWidth, this.gl.canvas.clientHeight);
         this.gl.canvas.addEventListener('resize', () => {
             this.gl.viewport(0, 0, this.gl.canvas.clientWidth, this.gl.canvas.clientHeight);
@@ -39,20 +36,29 @@ export class SceneRenderer {
     public setClearColor(clearColor: vec4) {
         this.clearColor = clearColor;
     }
+    public setBackground(materialName: string) {
+        const material = this.materials.get(materialName);
+        if (!material) throw new Error('Failed to set background material. Has it been loaded?');
+        this.background = material;
+    }
 
-    public async loadMaterial(name: string) {
+    public loadMaterial(name: string, textureUrls: string[] = []) {
         if (this.materials.has(name)) return;
-        const [vertFetch, fragFetch] = await Promise.all([
-            fetch(`/shaders/${name}.vert.glsl`),
-            fetch(`/shaders/${name}.frag.glsl`),
-        ]);
-        const [vertText, fragText] = await Promise.all([vertFetch, fragFetch].map(async (res) => res.text()));
-        // 404s get redirected to the index by react-router so start with <!DOCTYPE html>
-        // TODO something more elegant
-        const vertSrc = !vertText.startsWith('<!DOCTYPE html>') ? vertText : this.defaultMaterial!.vertexShaderSrc;
-        const fragSrc = !fragText.startsWith('<!DOCTYPE html>') ? fragText : this.defaultMaterial!.fragmentShaderSrc;
-        const material = new Material(this.gl, vertSrc, fragSrc).init();
-        this.materials.set(name, material);
+        const defaultMat = Material.default(this.gl);
+        this.materials.set(name, defaultMat);
+        const vertSrcUrl = `/shaders/${name}.vert.glsl`;
+        const fragSrcUrl = `/shaders/${name}.frag.glsl`;
+        Promise.all([vertSrcUrl, fragSrcUrl].map((url) => this.fetchShaderSrc(url)))
+            .then(([vertRes, fragRes]) => {
+            // 404s get redirected to index by react-router
+                const vertSrc = vertRes.startsWith('<!DOCTYPE html>') ? defaultMat.vertexShaderSrc : vertRes;
+                const fragSrc = fragRes.startsWith('<!DOCTYPE html>') ? defaultMat.fragmentShaderSrc : fragRes;
+                this.materials.set(name, new Material(this.gl, vertSrc, fragSrc, textureUrls));
+            });
+    }
+
+    private fetchShaderSrc(url: string): Promise<string> {
+        return fetch(url).then((res) => res.text());
     }
 
     private clear() {
@@ -73,28 +79,34 @@ export class SceneRenderer {
             const transform = entity.components.find((c) => c.type === ComponentType.TRANSFORM) as TransformComponent;
             const renderOptions = entity.components.find((c) => c.type === ComponentType.RENDER2D) as RendererComponent;
 
+            // TODO: Remove check once ECS returns a packed query result
             if (!transform || !renderOptions) return;
 
-            const material = this.materials.get(renderOptions.material) || this.defaultMaterial!;
-
-            const modelViewMatrix = mat4.create();
-            mat4.translate(modelViewMatrix, modelViewMatrix, transform.position);
-
-            // Tell WebGL how to pull out the positions from the position buffer into the vertexPosition attribute.
-            material.attributes.forEach((vertexAttribute) => vertexAttribute.bind(this.gl, this.squareBuffers.position));
-
-            // Tell WebGL to use our program when drawing
+            // Set the material
+            const material = this.materials.get(renderOptions.material)!;
             this.gl.useProgram(material.shaderProgram);
 
-            // Set the shader uniforms
-            // TODO: Bind uniforms dynamically without so much checking and branching in the hot loop
-            material.uniforms.find((u) => u.name === 'uProjectionMatrix')?.bindValue(scene.camera);
-            material.uniforms.find((u) => u.name === 'uModelViewMatrix')?.bindValue(modelViewMatrix);
-            const colorValue: vec4 = renderOptions.uniforms.find((u) => u.name === 'uColor')?.value as vec4 || [0.0, 0.0, 0.0, 0.0];
-            material.uniforms.find((u) => u.name === 'uColor')?.bindValue(colorValue);
+            // Set vertex attributes
+            material.vertexAttributes.forEach((vertexAttribute) => vertexAttribute.bind(this.gl, this.planeBuffer.buffer));
 
-            const uTime = material.uniforms.find((u) => u.name === 'uTime');
-            if (uTime) this.gl.uniform1f(uTime.index, window.performance.now());
+            // Set the shader uniforms
+            let samplerIndex = 0;
+            const uniformValues: UniformOverrides = {
+                uProjectionMatrix: scene.camera,
+                uTransformPosition: transform.position,
+                uTransformScale: transform.scale,
+                uColor1: [0.43, 0.02, 0.99, 1],
+                uColor2: [0.79, 0.61, 1.00, 1],
+                uTime: window.performance.now(),
+                ...renderOptions.uniforms,
+            };
+            material.uniforms.forEach((uniform) => uniform.bindValue(uniformValues[uniform.name] !== undefined
+                ? uniformValues[uniform.name]
+                : samplerIndex++));
+            material.textures.forEach((texture, i) => {
+                this.gl.activeTexture(this.gl[`TEXTURE${i.toString()}` as keyof WebGL2RenderingContext] as GLenum);
+                this.gl.bindTexture(this.gl.TEXTURE_2D, texture.texture);
+            });
 
             {
                 const offset = 0;

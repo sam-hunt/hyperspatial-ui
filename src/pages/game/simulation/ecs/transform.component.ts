@@ -6,9 +6,9 @@ export class TransformComponent implements Component {
     public type: ComponentType.TRANSFORM = ComponentType.TRANSFORM;
 
     public constructor(
-        public position: vec3,
-        // TODO: scale and rot
-        // public scale: vec3,
+        public position: vec3 = [0, 0, 0],
+        public scale: vec3 = [1, 1, 1],
+        // TODO: rotation
         // public rotation: vec3, // TODO: Check type
     ) {}
 
