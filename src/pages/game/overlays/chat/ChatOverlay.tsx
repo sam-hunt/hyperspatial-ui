@@ -9,8 +9,8 @@ import { useChat } from 'hooks/use-chat';
 import { useLocalStorage } from 'hooks/use-local-storage';
 
 import { hexToRgb } from 'utils/hex-to-rgb';
+import { useScrollbarStyles } from 'hooks/use-scrollbar-styles';
 import { ChatLine } from './ChatLine';
-import './ChatOverlay.css';
 
 export const ChatOverlay: FC = () => {
     const [showChat, setShowChat] = useState<boolean>(false);
@@ -22,7 +22,7 @@ export const ChatOverlay: FC = () => {
     // and enforce channel etc
     const [author] = useLocalStorage<string>('playerName', 'Unknown');
 
-    const { chatBuffer, sendChat } = useChat(50);
+    const { chatBuffer, sendChat } = useChat(100);
 
     const [springStyle, springTrigger] = useSpring({
         width: 0,
@@ -30,7 +30,10 @@ export const ChatOverlay: FC = () => {
         reset: true,
         reverse: !showChat,
     }, []);
+
+    const opacity = 0.6;
     const theme = useTheme();
+    const scrollbarStyles = useScrollbarStyles(opacity);
 
     const toggleChat = () => {
         springTrigger.start(!showChat ? { width: 480, height: 320 } : { width: 0, height: 0 });
@@ -38,7 +41,7 @@ export const ChatOverlay: FC = () => {
         setLastSeenAt(dayjs());
     };
     const iconPath = showChat ? mdiChatOutline : mdiChatProcessingOutline;
-    const unseenChatCount = showChat ? 0 : chatBuffer.reduce((acc, val) => acc + (dayjs(val.ts).diff(lastSeenAt, 'milliseconds') > 0 ? 1 : 0), 0);
+    const unseenChatCount = showChat ? 0 : chatBuffer.reduce((acc, val) => acc + (dayjs(val.ts).diff(lastSeenAt, 'ms') > 0 ? 1 : 0), 0);
 
     const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter') {
@@ -86,8 +89,7 @@ export const ChatOverlay: FC = () => {
                         <Box
                             display="flex"
                             flexDirection="column-reverse"
-                            className="hide-scrollbar"
-                            sx={{ width: '100%', height: '100%', overflowY: 'scroll' }}
+                            sx={{ width: '100%', height: '100%', overflowY: 'overlay', ...scrollbarStyles }}
                         >
                             {chatBuffer.map((chat) => <ChatLine chat={chat} key={chat.author + chat.ts} />)}
                         </Box>
@@ -98,7 +100,7 @@ export const ChatOverlay: FC = () => {
                 position: 'absolute', left: 1, bottom: 1, display: 'flex', flexDirection: 'row',
             }}
             >
-                <IconButton title="Chat" color="primary" onClick={toggleChat}>
+                <IconButton title="Chat" color={showChat ? 'primary' : undefined} onClick={toggleChat}>
                     {unseenChatCount > 0
                         ? (
                             <Badge badgeContent={unseenChatCount} color="error">
