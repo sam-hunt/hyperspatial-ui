@@ -1,20 +1,23 @@
 import { useTheme } from '@mui/material';
-import { hexToRgb } from 'utils/hex-to-rgb';
+import { hexToCss } from 'utils/color-format';
 
-export const useScrollbarStyles = (opacity: number = 1, isPaperBg?: boolean) => {
+export interface ScrollbarStyleOptions {
+    opacity?: number;
+    isPaperBg?: boolean;
+}
+
+export const useScrollbarStyles = (options: ScrollbarStyleOptions) => {
+    const { opacity, isPaperBg } = { opacity: 1.0, isPaperBg: false, ...options };
     const theme = useTheme();
 
     const trackBgPalette = isPaperBg ? theme.palette.background.paper : theme.palette.background.default;
-    const trackBgColor = hexToRgb(trackBgPalette)!;
-    const trackBg = `rgba(${trackBgColor.r},${trackBgColor.g},${trackBgColor.b},${opacity})`;
+    const trackBg = hexToCss(trackBgPalette, opacity);
 
     const thumbBgPalette = theme.palette.primary.main;
-    const thumbBgColor = hexToRgb(thumbBgPalette)!;
-    const thumbBg = `rgba(${thumbBgColor.r},${thumbBgColor.g},${thumbBgColor.b},${opacity})`;
+    const thumbBg = hexToCss(thumbBgPalette, opacity);
 
     const hoverBgPalette = theme.palette.secondary.main;
-    const hoverBgColor = hexToRgb(hoverBgPalette)!;
-    const hoverBg = `rgba(${hoverBgColor.r},${hoverBgColor.g},${hoverBgColor.b},${opacity})`;
+    const hoverBg = hexToCss(hoverBgPalette, opacity);
 
     /**
      * @todo TODO: Firefox styling!

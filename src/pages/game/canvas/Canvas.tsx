@@ -3,7 +3,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 
 import { useWindowSize } from 'hooks/use-window-size';
 import { useApiWebSocket } from 'hooks/use-api-websocket';
-import { hexToGL } from 'utils/hex-to-gl';
+import { hexToGL } from 'utils/color-format';
 import { Simulation } from '../simulation/simulation.interface';
 import { SimulationImpl } from '../simulation/simulation-impl';
 import './Canvas.css';
