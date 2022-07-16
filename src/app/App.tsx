@@ -1,14 +1,19 @@
 import { createContext, useMemo } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { CssBaseline, PaletteMode, ThemeProvider } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 
 import { NavOverlay } from 'components/nav-overlay/NavOverlay';
+
 import { useLocalStorage } from 'hooks/use-local-storage';
+
 import { GamePage } from 'pages/game/GamePage';
 import { StatsPage } from 'pages/stats/StatsPage';
 import { SettingsPage } from 'pages/settings/SettingsPage';
+
 import { themeFromMode } from './theme';
 import './App.css';
+
+import type { PaletteMode } from '@mui/material';
 
 export interface ThemeContextType {
     currentTheme: string,

@@ -1,4 +1,4 @@
-import { vec4 } from 'gl-matrix';
+import type { vec4 } from 'gl-matrix';
 
 const matchHex = (hex: string) => {
     // Expand shorthand form (e.g. '03F') to full form (e.g. '0033FF')

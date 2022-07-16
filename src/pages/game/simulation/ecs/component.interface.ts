@@ -1,4 +1,4 @@
-import { ComponentType } from './component-type.enum';
+import type { ComponentType } from './component-type.enum';
 
 export interface Component {
     type: ComponentType;

@@ -1,11 +1,12 @@
-import { vec4 } from 'gl-matrix';
 import { ComponentType } from '../ecs/component-type.enum';
-import { EcsRegistry } from '../ecs/ecs-registry';
-import { TransformComponent } from '../ecs/transform.component';
-import { Scene } from '../scenes/scene';
 import { Material } from './material';
-import { RendererComponent, UniformOverrides } from '../ecs/renderer.component';
 import { VertexBuffer } from './vertex-buffer';
+
+import type { vec4 } from 'gl-matrix';
+import type { Scene } from '../scenes/scene';
+import type { EcsRegistry } from '../ecs/ecs-registry';
+import type { TransformComponent } from '../ecs/transform.component';
+import type { RendererComponent, UniformOverrides } from '../ecs/renderer.component';
 
 export class SceneRenderer {
     private gl: WebGL2RenderingContext;

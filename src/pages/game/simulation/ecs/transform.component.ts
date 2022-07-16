@@ -1,6 +1,7 @@
-import { vec3 } from 'gl-matrix';
 import { ComponentType } from './component-type.enum';
-import { Component } from './component.interface';
+
+import type { vec3 } from 'gl-matrix';
+import type { Component } from './component.interface';
 
 export class TransformComponent implements Component {
     public type: ComponentType.TRANSFORM = ComponentType.TRANSFORM;

@@ -1,6 +1,7 @@
 import { Box, Typography, useTheme } from '@mui/material';
-import { FC } from 'react';
 import { useSpring, animated } from 'react-spring';
+
+import type { FC } from 'react';
 
 export const WIP: FC = () => {
     const theme = useTheme();

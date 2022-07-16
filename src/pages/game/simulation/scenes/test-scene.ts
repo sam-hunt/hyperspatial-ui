@@ -1,21 +1,24 @@
 import dayjs from 'dayjs';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { v4 as uuid } from 'uuid';
+import { grey } from '@mui/material/colors';
 
 import { royal, lavender } from 'app/theme';
-import { SpawnEvent } from 'pages/game/events/spawn-event';
-import { DespawnEvent } from 'pages/game/events/despawn-event';
-import { MoveEvent } from 'pages/game/events/move.event';
-import { grey } from '@mui/material/colors';
+
 import { hexToGL } from 'utils/color-format';
-import { Scene } from './scene';
+
 import { TransformComponent } from '../ecs/transform.component';
 import { ComponentType } from '../ecs/component-type.enum';
-import { Component } from '../ecs/component.interface';
 import { UuidComponent } from '../ecs/uuid.components';
 import { NameComponent } from '../ecs/name.component';
-import { SimulationInternals } from '../simulation-internals.interface';
 import { RendererComponent } from '../ecs/renderer.component';
+
+import type { MoveEvent } from 'pages/game/events/move.event';
+import type { DespawnEvent } from 'pages/game/events/despawn-event';
+import type { SpawnEvent } from 'pages/game/events/spawn-event';
+import type { Component } from '../ecs/component.interface';
+import type { SimulationInternals } from '../simulation-internals.interface';
+import type { Scene } from './scene';
 
 export class TestScene implements Scene {
     private playerId = uuid();

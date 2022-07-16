@@ -1,14 +1,15 @@
 import EventEmitter from 'events';
-import { vec4 } from 'gl-matrix';
-import { AbstractEvent } from '../events/abstract-event';
+
 import { CanvasIO } from './canvas-io';
 import { EcsRegistry } from './ecs/ecs-registry';
 import { SceneRenderer } from './renderer/scene-renderer';
-import { Scene } from './scenes/scene';
-// import { TestScene } from './scenes/test-scene';
 import { GalaxyScene } from './scenes/galaxy-scene';
-import { Simulation } from './simulation.interface';
-import { SimulationInternals } from './simulation-internals.interface';
+
+import type { vec4 } from 'gl-matrix';
+import type { AbstractEvent } from '../events/abstract-event';
+import type { Scene } from './scenes/scene';
+import type { Simulation } from './simulation.interface';
+import type { SimulationInternals } from './simulation-internals.interface';
 
 export class SimulationImpl implements Simulation, SimulationInternals {
     private prevTimestamp = 0;
