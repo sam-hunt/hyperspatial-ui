@@ -1,10 +1,12 @@
-import { FC, useContext } from 'react';
+import { useContext } from 'react';
 import Icon from '@mdi/react';
 import { mdiBrightness4, mdiBrightness7 } from '@mdi/js';
 import { Container, IconButton, TextField, Typography } from '@mui/material';
 
 import { ThemeContext } from 'app/App';
 import { useLocalStorage } from 'hooks/use-local-storage';
+
+import type { FC } from 'react';
 
 export const SettingsPage: FC = () => {
     const { currentTheme, toggleTheme } = useContext(ThemeContext);

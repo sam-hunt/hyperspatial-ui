@@ -1,4 +1,4 @@
-import { mat4, vec4 } from 'gl-matrix';
+import type { mat4, vec4 } from 'gl-matrix';
 
 // TODO: Refactor to interface probably
 

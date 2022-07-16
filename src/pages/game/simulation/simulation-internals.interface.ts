@@ -1,8 +1,8 @@
-import EventEmitter from 'events';
-import { AbstractEvent } from '../events/abstract-event';
-import { CanvasIO } from './canvas-io';
-import { EcsRegistry } from './ecs/ecs-registry';
-import { SceneRenderer } from './renderer/scene-renderer';
+import type EventEmitter from 'events';
+import type { AbstractEvent } from '../events/abstract-event';
+import type { CanvasIO } from './canvas-io';
+import type { EcsRegistry } from './ecs/ecs-registry';
+import type { SceneRenderer } from './renderer/scene-renderer';
 
 export interface SimulationInternals {
     sceneRenderer: SceneRenderer | null;

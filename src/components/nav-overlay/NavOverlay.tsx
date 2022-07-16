@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Icon from '@mdi/react';
 import { mdiStarFourPoints } from '@mdi/js';
@@ -6,6 +6,8 @@ import { Box, IconButton, Typography, useTheme } from '@mui/material';
 
 import { navItems } from './nav-items';
 import { NavOverlayItem } from './NavOverlayItem';
+
+import type { FC } from 'react';
 
 export const NavOverlay: FC = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);

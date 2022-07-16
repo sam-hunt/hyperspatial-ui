@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
-import { ChatEvent } from 'pages/game/events/chat-event';
 import { useApiWebSocket } from './use-api-websocket';
+
+import type { ChatEvent } from 'pages/game/events/chat-event';
 
 export interface UseChatOptions {
     bufferSize?: number;

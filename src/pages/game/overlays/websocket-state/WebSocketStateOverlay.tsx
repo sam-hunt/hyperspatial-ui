@@ -4,7 +4,8 @@ import { IconButton } from '@mui/material';
 import { ReadyState } from 'react-use-websocket';
 
 import { useApiWebSocket } from 'hooks/use-api-websocket';
-import { FC } from 'react';
+
+import type { FC } from 'react';
 
 const wsStates = {
     [ReadyState.CONNECTING]: {

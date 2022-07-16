@@ -1,5 +1,4 @@
-// import { ComponentType } from './component-type';
-import { Component } from './component.interface';
+import type { Component } from './component.interface';
 
 export interface Entity {
     id: number;

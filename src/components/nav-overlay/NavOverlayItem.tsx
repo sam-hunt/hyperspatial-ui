@@ -1,10 +1,10 @@
 import Icon from '@mdi/react';
 import { IconButton, Typography, useTheme } from '@mui/material';
-import { FC } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useSpring, animated } from 'react-spring';
 
-import { NavItem } from './nav-items';
+import type { FC } from 'react';
+import type { NavItem } from './nav-items';
 
 export interface NavOverlayItemProps {
     navItem: NavItem,

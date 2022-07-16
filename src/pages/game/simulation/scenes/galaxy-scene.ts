@@ -1,10 +1,11 @@
 import { mat4, vec4 } from 'gl-matrix';
 
-import { Scene } from './scene';
 import { TransformComponent } from '../ecs/transform.component';
 import { NameComponent } from '../ecs/name.component';
-import { SimulationInternals } from '../simulation-internals.interface';
 import { RendererComponent } from '../ecs/renderer.component';
+
+import type { SimulationInternals } from '../simulation-internals.interface';
+import type { Scene } from './scene';
 
 export class GalaxyScene implements Scene {
     public camera = mat4.create();

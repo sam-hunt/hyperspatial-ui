@@ -1,12 +1,16 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@mui/material';
-import { FC, useEffect, useMemo, useState } from 'react';
 
 import { useWindowSize } from 'hooks/use-window-size';
 import { useApiWebSocket } from 'hooks/use-api-websocket';
+
 import { hexToGL } from 'utils/color-format';
-import { Simulation } from '../simulation/simulation.interface';
+
 import { SimulationImpl } from '../simulation/simulation-impl';
 import './Canvas.css';
+
+import type { FC } from 'react';
+import type { Simulation } from '../simulation/simulation.interface';
 
 const SCROLLBAR_WIDTH = 18;
 

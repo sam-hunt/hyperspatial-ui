@@ -1,16 +1,19 @@
 import dayjs from 'dayjs';
-import { FC, KeyboardEvent, useState } from 'react';
+import { useState } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { Box, TextField, useTheme } from '@mui/material';
+import { mdiChatOutline, mdiChatProcessingOutline } from '@mdi/js';
 
 import { useChat } from 'hooks/use-chat';
 import { useLocalStorage } from 'hooks/use-local-storage';
-
 import { useScrollbarStyles } from 'hooks/use-scrollbar-styles';
+
 import { hexToCss } from 'utils/color-format';
-import { mdiChatOutline, mdiChatProcessingOutline } from '@mdi/js';
+
 import { ChatLine } from './ChatLine';
 import { IconBadgeButton } from './IconBadgeButton';
+
+import type { FC, KeyboardEvent } from 'react';
 
 export const ChatOverlay: FC = () => {
     const [showChat, setShowChat] = useState<boolean>(false);

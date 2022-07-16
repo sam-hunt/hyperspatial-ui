@@ -1,5 +1,7 @@
-import { createTheme, PaletteMode } from '@mui/material';
+import { createTheme } from '@mui/material';
 import { grey } from '@mui/material/colors';
+
+import type { PaletteMode } from '@mui/material';
 
 export const lavender = {
     main: '#CB9EFF',
