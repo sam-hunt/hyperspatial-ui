@@ -1,4 +1,4 @@
-import type { AbstractEvent } from './abstract-event';
+import type { AbstractEvent } from './abstractEvent';
 
 export interface DespawnEvent extends AbstractEvent {
     event: 'despawn';

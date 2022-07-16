@@ -1,4 +1,4 @@
-import { ComponentType } from '../ecs/component-type.enum';
+import { ComponentType } from 'types/global/componentType.enum';
 import { Material } from './material';
 import { VertexBuffer } from './vertex-buffer';
 

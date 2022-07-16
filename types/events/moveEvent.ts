@@ -1,5 +1,5 @@
 import type { vec3 } from 'gl-matrix';
-import type { AbstractEvent } from './abstract-event';
+import type { AbstractEvent } from './abstractEvent';
 
 export interface MoveEvent extends AbstractEvent {
     event: 'move';

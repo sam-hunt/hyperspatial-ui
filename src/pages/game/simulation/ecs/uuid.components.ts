@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import { ComponentType } from './component-type.enum';
+import { ComponentType } from 'types/global/componentType.enum';
 
-import type { Component } from './component.interface';
+import type { Component } from 'types/global/component';
 
 export class UuidComponent implements Component {
     public type: ComponentType.UUID = ComponentType.UUID;
