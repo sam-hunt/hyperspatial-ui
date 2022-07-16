@@ -19,9 +19,16 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "src",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "./src/*", "./*"
+      ]
+    }
   },
   "include": [
-    "src",
+    "src/**/*",
+    "types/**/*",
+    "jest.setup.ts",
   ]
 }
