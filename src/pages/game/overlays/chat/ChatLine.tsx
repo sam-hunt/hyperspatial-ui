@@ -2,7 +2,7 @@ import { Typography, useTheme } from '@mui/material';
 import { useLocalStorage } from 'hooks/use-local-storage';
 
 import type { FC } from 'react';
-import type { ChatEvent } from '../../events/chat-event';
+import type { ChatEvent } from 'types/events';
 
 export interface ChatLineProps {
     chat: ChatEvent;
