@@ -21,7 +21,7 @@ export const hexToGL = (hex: string): vec4 => {
 
 export const hexToCss = (hex: string, opacity: number) => {
     const result = matchHex(hex);
-    if (!result) return null;
+    if (!result) return undefined;
     return `rgba(${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)},${opacity})`;
 };
 

@@ -6,8 +6,7 @@ export interface ScrollbarStyleOptions {
     isPaperBg?: boolean;
 }
 
-export const useScrollbarStyles = (options: ScrollbarStyleOptions) => {
-    const { opacity, isPaperBg } = { opacity: 1.0, isPaperBg: false, ...options };
+export const useScrollbarStyles = ({ isPaperBg = false, opacity = 1.0 }: ScrollbarStyleOptions) => {
     const theme = useTheme();
 
     const trackBgPalette = isPaperBg ? theme.palette.background.paper : theme.palette.background.default;
