@@ -1,4 +1,4 @@
-import { ComponentType } from './component-type.enum';
+import { ComponentType } from 'types/global/componentType.enum';
 
 export class NameComponent {
     public type: ComponentType.NAME = ComponentType.NAME;

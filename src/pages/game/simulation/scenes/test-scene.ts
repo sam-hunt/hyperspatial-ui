@@ -7,16 +7,14 @@ import { royal, lavender } from 'app/theme';
 
 import { hexToGL } from 'utils/color-format';
 
+import { ComponentType } from 'types/global/componentType.enum';
 import { TransformComponent } from '../ecs/transform.component';
-import { ComponentType } from '../ecs/component-type.enum';
 import { UuidComponent } from '../ecs/uuid.components';
 import { NameComponent } from '../ecs/name.component';
 import { RendererComponent } from '../ecs/renderer.component';
 
-import type { MoveEvent } from 'pages/game/events/move.event';
-import type { DespawnEvent } from 'pages/game/events/despawn-event';
-import type { SpawnEvent } from 'pages/game/events/spawn-event';
-import type { Component } from '../ecs/component.interface';
+import type { MoveEvent, DespawnEvent, SpawnEvent } from 'types/events';
+import type { Component } from 'types/global/component';
 import type { SimulationInternals } from '../simulation-internals.interface';
 import type { Scene } from './scene';
 

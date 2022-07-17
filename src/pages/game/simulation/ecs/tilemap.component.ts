@@ -1,6 +1,6 @@
-import { ComponentType } from './component-type.enum';
+import { ComponentType } from 'types/global/componentType.enum';
 
-import type { Component } from './component.interface';
+import type { Component } from 'types/global/component';
 
 export class TilemapComponent implements Component {
     public type: ComponentType.TILEMAP = ComponentType.TILEMAP;
