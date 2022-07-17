@@ -22,13 +22,11 @@
     "baseUrl": ".",
     "paths": {
       "*": [
-        "./src/*", "./*"
-      ]
-    }
+        "*", "src/*"
+      ],
+    },
   },
   "include": [
-    "src/**/*",
-    "types/**/*",
-    "jest.setup.ts",
+    "./src/",
   ]
 }
