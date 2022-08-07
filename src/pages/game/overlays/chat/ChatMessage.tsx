@@ -4,15 +4,14 @@ import { useLocalStorage } from 'hooks/use-local-storage';
 import type { FC } from 'react';
 import type { ChatEvent } from '../../events/chat-event';
 
-export interface ChatLineProps {
+export interface ChatMessageProps {
     chat: ChatEvent;
 }
 
-export const ChatLine: FC<ChatLineProps> = ({ chat }) => {
+export const ChatMessage: FC<ChatMessageProps> = ({ chat }) => {
+    const theme = useTheme();
     // TODO: Refactor to player context
     const [author] = useLocalStorage<string>('playerName', 'Unknown');
-
-    const theme = useTheme();
 
     // TODO: Compare on player id instead of name
     const color = chat.author === author
