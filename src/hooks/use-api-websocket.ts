@@ -29,12 +29,12 @@ export const useApiWebSocket = <T extends AbstractEvent>(eventTypes: T['event'][
 
     if (lastJsonMessage !== cachedEvent) {
         eventHasChanged = true;
-        setCachedEvent(lastJsonMessage as T);
+        setCachedEvent(lastJsonMessage);
     }
 
     return {
-        lastEvent: eventHasChanged ? lastJsonMessage as T : cachedEvent,
-        sendEvent: sendJsonMessage as (jsonMessage: T, keep?: boolean) => void,
+        lastEvent: eventHasChanged ? lastJsonMessage : cachedEvent,
+        sendEvent: sendJsonMessage,
         readyState,
     };
 };
