@@ -6,7 +6,7 @@ import { SceneRenderer } from './renderer/scene-renderer';
 import { GalaxyScene } from './scenes/galaxy-scene';
 
 import type { vec4 } from 'gl-matrix';
-import type { AbstractEvent } from '../events/abstract-event';
+import type { AbstractEvent } from 'types/events';
 import type { Scene } from './scenes/scene';
 import type { Simulation } from './simulation.interface';
 import type { SimulationInternals } from './simulation-internals.interface';

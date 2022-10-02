@@ -4,7 +4,7 @@ import useWebSocket from 'react-use-websocket';
 import { apiWsUrl } from 'app/env';
 
 import type { Options as WsOptions, ReadyState } from 'react-use-websocket';
-import type { AbstractEvent } from 'pages/game/events/abstract-event';
+import type { AbstractEvent } from 'types/events/abstractEvent';
 
 export interface UseApiWebSocket<T extends AbstractEvent> {
     lastEvent: T | null;
